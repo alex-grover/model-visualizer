@@ -1,6 +1,7 @@
 Gem::Specification.new do |s|
   s.name        = 'model-visualizer'
   s.version     = '0.0.0'
+  s.executables << 'model-visualizer'
   s.date        = '2015-04-07'
   s.summary     = "A model visualizer for Rails."
   s.description = "An easy way to create a visual of the model structure in your Rails projects."
