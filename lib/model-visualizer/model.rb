@@ -1,6 +1,11 @@
 #!/usr/bin/env ruby
 
 class Model
+    attr_reader :belongs_to
+    attr_reader :has_one
+    attr_reader :has_many
+    attr_reader :has_and_belongs_to_many
+
     def initialize(name)
         @name = name
         @belongs_to = Array.new
@@ -8,6 +13,7 @@ class Model
         @has_many = Array.new
         @has_and_belongs_to_many = Array.new
     end
+
 
     def add_belongs_to(model)
     	@belongs_to << model
