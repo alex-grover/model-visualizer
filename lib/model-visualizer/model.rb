@@ -26,7 +26,11 @@ class Model
     end
 
     def to_s
-        @name
+        str = @name + ":"
+        str += "\n\tbelongs_to: [" + @belongs_to.join(", ") + "]"
+        str += "\n\thas_one: [" + @has_one.join(", ") + "]"
+        str += "\n\thas_many: [" + @has_many.join(", ") + "]"
+        str += "\n\thas_and_belongs_to_many: [" + @has_and_belongs_to_many.join(", ") + "]"
+        str
     end
-
 end
