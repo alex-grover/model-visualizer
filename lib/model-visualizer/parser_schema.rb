@@ -2,17 +2,16 @@
 
 require_relative 'model'
 
-class ParserSchema
+class ParserSchema(models)
     def parse
         file = Dir['db/schema']
-        models = Array.new
         curr_model = nil
 
-        
         IO.foreach(file) do |line|
             if line.include? 'create_table'
                 name = /"([[:alpha:]]+)"/.match(line)[1]
-                curr_model = Model.new(name) #name would be a bit different because capitalization
+                name = normalize(name)
+                curr_model = models[name]
             end
 
             if line.include? 't.integer'
@@ -30,9 +29,20 @@ class ParserSchema
             end
         end
 
-        models.push(curr_model)
+        models[name] = curr_model
         end
 
         models
+    end
+
+    def normalize(name)
+        name = name[0..-1]
+        curr_index = 0
+        while !curr_index.nil?
+            name[curr_index] = name[curr_index].upcase
+            curr_index = name.index('_', curr_index + 1) + 1
+        end
+        name.gsub!('_', '')
+        return name
     end
 end
