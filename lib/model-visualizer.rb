@@ -6,8 +6,7 @@ require 'model-visualizer/visualizer'
 class ModelVisualizer
     # Entry point into the gem. Runs the parser and visualizer to generate the full visualization.
     def self.run
-        parser = Parser.new
-        models = parser.parse
+        models = Parser.parse
 
         visualizer = Visualizer.new(models)
         visualizer.create_visualization

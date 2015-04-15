@@ -17,7 +17,6 @@ class Model
         @foreign_keys = Array.new
     end
 
-
     def add_belongs_to(model)
     	@belongs_to << model
     end
@@ -55,5 +54,6 @@ class Model
         str += "\n\tinteger attributes: [" + @integer_attributes.join(", ") + "]"
         str += "\n\tstring attributes: [" + @string_attributes.join(", ") + "]"
         str += "\n\tforeign keys: [" + @foreign_keys.join(", ") + "]"
+        str
     end
 end
