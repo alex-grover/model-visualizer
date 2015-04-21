@@ -41,52 +41,42 @@ class SchemaParser
             elsif line.include? 't.string'
                 string = /t\.string\s+"(\w+)"/.match(line)[1]
                 curr_model.add_string_attribute(string)
-            end
 
             elsif line.include? 't.primary_key'
                 primary_key = /t\.primary_key\s+"(\w+)"/.match(line)[1]
                 curr_model.add_primary_key_attribute(primary_key)
-            end
 
             elsif line.include? 't.text'
                 text = /t\.text\s+"(\w+)"/.match(line)[1]
                 curr_model.add_text_attribute(text)
-            end
 
             elsif line.include? 't.float'
                 float = /t\.float\s+"(\w+)"/.match(line)[1]
                 curr_model.add_float_attribute(float)
-            end
 
             elsif line.include? 't.decimal'
                 decimal = /t\.decimal\s+"(\w+)"/.match(line)[1]
                 curr_model.add_decimal_attribute(decimal)
-            end
 
             elsif line.include? 't.datetime'
                 datetime = /t\.datetime\s+"(\w+)"/.match(line)[1]
                 curr_model.add_datetime_attribute(datetime)
-            end
 
             elsif line.include? 't.timestamp'
                 timestamp = /t\.timestamp\s+"(\w+)"/.match(line)[1]
                 curr_model.add_timestamp_attribute(timestamp)
-            end
 
             elsif line.include? 't.time'
                 time = /t\.time\s+"(\w+)"/.match(line)[1]
                 curr_model.add_time_attribute(time)
-            end
 
             elsif line.include? 't.date'
                 date = /t\.date\s+"(\w+)"/.match(line)[1]
                 curr_model.add_date_attribute(date)
-            end
 
             elsif line.include? 't.binary'
                 binary = /t\.binary\s+"(\w+)"/.match(line)[1]
                 curr_model.add_binary_attribute(binary)
-            end
 
             elsif line.include? 't.boolean'
                 boolean = /t\.boolean\s+"(\w+)"/.match(line)[1]
