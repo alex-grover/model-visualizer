@@ -1,6 +1,7 @@
 # For testing
 app/
 db/
+*.html
 
 *.gem
 *.rbc
