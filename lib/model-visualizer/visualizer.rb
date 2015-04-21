@@ -6,8 +6,8 @@ class Visualizer
     end
 
     def create_visualization
-        for model in @models
-            puts model
+        @models.each do |key, value|
+            puts value
         end
     end
 end
