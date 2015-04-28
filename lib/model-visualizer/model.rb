@@ -108,25 +108,31 @@ class Model
         @foreign_keys << key
     end
 
-    def to_s
-        str = @name + ":"
-        str += "\n\tbelongs_to: [" + @belongs_to.join(", ") + "]"
-        str += "\n\thas_one: [" + @has_one.join(", ") + "]"
-        str += "\n\thas_many: [" + @has_many.join(", ") + "]"
-        str += "\n\thas_and_belongs_to_many: [" + @has_and_belongs_to_many.join(", ") + "]"
-        str += "\n\tinteger attributes: [" + @integer_attributes.join(", ") + "]"
-        str += "\n\tstring attributes: [" + @string_attributes.join(", ") + "]"
-        str += "\n\tprimary key attributes: [" + @primary_key_attributes.join(", ") + "]"
-        str += "\n\ttext attributes: [" + @text_attributes.join(", ") + "]"
-        str += "\n\tfloat attributes: [" + @float_attributes.join(", ") + "]"
-        str += "\n\tdecimal attributes: [" + @decimal_attributes.join(", ") + "]"
-        str += "\n\tdatetime attributes: [" + @datetime_attributes.join(", ") + "]"
-        str += "\n\ttimestamp attributes: [" + @timestamp_attributes.join(", ") + "]"
-        str += "\n\ttime attributes: [" + @time_attributes.join(", ") + "]"
-        str += "\n\tdate attributes: [" + @date_attributes.join(", ") + "]"
-        str += "\n\tbinary attributes: [" + @binary_attributes.join(", ") + "]"
-        str += "\n\tboolean attributes: [" + @boolean_attributes.join(", ") + "]"
-        str += "\n\tforeign keys: [" + @foreign_keys.join(", ") + "]"
-        str
+    def to_json(options = {})
+        {
+            'name' => @name,
+            'associations' => {
+                'belongs_to' => @belongs_to,
+                'has_one' => @has_one,
+                'has_many' => @has_many,
+                'has_and_belongs_to_many' => @has_and_belongs_to_many
+            },
+            'schema_info' => {
+                'integer_attributes' => @integer_attributes,
+                'string_attributes' => @string_attributes,
+                'primary_key_attributes' => @primary_key_attributes,
+                'text_attributes' => @text_attributes,
+                'float_attributes' => @float_attributes,
+                'decimal_attributes' => @decimal_attributes,
+                'date_attributes' => @date_attributes,
+                'datetime_attributes' => @datetime_attributes,
+                'time_attributes' => @time_attributes,
+                'timestamp_attributes' => @timestamp_attributes,
+                'binary_attributes' => @binary_attributes,
+                'boolean_attributes' => @boolean_attributes,
+                'foreign_keys' => @foreign_keys
+            }
+        }.to_json
     end
+
 end
