@@ -13,23 +13,12 @@ class SchemaParser
         # skip = false
 
         IO.foreach('db/schema.rb') do |line|
-            # if skip == true
-            #     if line.include? 'end'
-            #         skip = false
-            #     end
-            #     next
-            # end
-
             if line.include? 'create_table'
-                # if line.include? 'slug' or line.include? 'tag' or line.include? 'version'
-                #     skip = true
-                #     next
-                # end
-
                 name = /"([a-zA-Z_]+)"/.match(line)[1]
                 fixed_name = fix_case(name)
                 curr_model = @models[fixed_name]
 
+                # Rails generated models are not in hash
                 if curr_model == nil
                     curr_model = Model.new(fixed_name)
                     @models[fixed_name] = curr_model

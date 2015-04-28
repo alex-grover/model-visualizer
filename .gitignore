@@ -1,7 +1,5 @@
-# For testing
-app/
-db/
-*.html
+# Output file
+modelVisualizer.html
 
 *.gem
 *.rbc

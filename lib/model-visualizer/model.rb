@@ -41,19 +41,19 @@ class Model
     end
 
     def add_belongs_to(model)
-    	@belongs_to << model
+        @belongs_to << model
     end
 
     def add_has_one(model)
-    	@has_one << model
+        @has_one << model
     end
 
     def add_has_many(model)
-    	@has_many << model
+        @has_many << model
     end
 
     def add_has_and_belongs_to_many(model)
-    	@has_and_belongs_to_many << model
+        @has_and_belongs_to_many << model
     end
 
     def add_integer_attribute(integer)
