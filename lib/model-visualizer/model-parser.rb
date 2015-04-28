@@ -8,6 +8,10 @@ class ModelParser
     end
 
     def parse
+        unless Dir.exists? 'app/models/'
+            abort 'app/models/ directory does not exist! Make sure you are in the root directory of your Rails project.'
+        end
+
         # TODO: make sure we should only be grabbing model files, not subdirectories
         files = Dir['app/models/*.rb']
         curr_model = nil

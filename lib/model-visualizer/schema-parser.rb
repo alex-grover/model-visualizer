@@ -4,15 +4,20 @@ require 'active_support/inflector'
 require_relative 'model'
 
 class SchemaParser
+    SCHEMA_FILE = 'db/schema.rb'
+
     def initialize(models)
         @models = models
     end
 
     def parse
-        curr_model = nil
-        # skip = false
+        unless File.file? SCHEMA_FILE
+            abort 'db/schema.rb does not exist! Make sure you are in the root directory of your Rails project.'
+        end
 
-        IO.foreach('db/schema.rb') do |line|
+        curr_model = nil
+
+        IO.foreach(SCHEMA_FILE) do |line|
             if line.include? 'create_table'
                 name = /"([a-zA-Z_]+)"/.match(line)[1]
                 fixed_name = fix_case(name)
