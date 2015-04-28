@@ -10,8 +10,8 @@ class Parser
         model_parser = ModelParser.new(models)
         model_parser.parse
 
-        #schema_parser = SchemaParser.new(models)
-        #schema_parser.parse
+        schema_parser = SchemaParser.new(models)
+        schema_parser.parse
 
         models
     end

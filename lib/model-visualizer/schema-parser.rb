@@ -10,24 +10,30 @@ class SchemaParser
 
     def parse
         curr_model = nil
-        skip = false
+        # skip = false
 
         IO.foreach('db/schema.rb') do |line|
-            if skip == true
-                if line.include? 'end'
-                    skip = false
-                end
-                next
-            end
+            # if skip == true
+            #     if line.include? 'end'
+            #         skip = false
+            #     end
+            #     next
+            # end
 
             if line.include? 'create_table'
-                if line.include? 'slug' or line.include? 'tag' or line.include? 'version'
-                    skip = true
-                    next
-                end
+                # if line.include? 'slug' or line.include? 'tag' or line.include? 'version'
+                #     skip = true
+                #     next
+                # end
 
                 name = /"([a-zA-Z_]+)"/.match(line)[1]
-                curr_model = @models[fix_case(name)]
+                fixed_name = fix_case(name)
+                curr_model = @models[fixed_name]
+
+                if curr_model == nil
+                    curr_model = Model.new(fixed_name)
+                    @models[fixed_name] = curr_model
+                end
 
             elsif line.include? 't.integer'
                 match = /t\.integer\s+"([[:alpha:]]+_id)"/.match(line)
