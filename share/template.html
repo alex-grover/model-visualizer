@@ -21,16 +21,11 @@
                     if (data.hasOwnProperty(name)) {
                         node = data[name];
                         node.node_number = i++;
-                        var obj = {
+                        nodes.push({
                             name: name,
-                            group: 1
-                        };
-                        for (var attr in node.schema_info) {
-                            if (node.schema_info[attr] !== []) {
-                                obj[attr] = node.schema_info[attr];
-                            }
-                        }
-                        nodes.push(obj);
+                            group: 1,
+                            schema_info: node.schema_info
+                        });
                     }
                 }
 
@@ -38,12 +33,12 @@
                 for (var name in data) {
                     if (data.hasOwnProperty(name)) {
                         node = data[name];
-                        for (var association_type in node.associations) {
-                            node.associations[association_type].forEach(function(assn) {
+                        for (var assn_type in node.associations) {
+                            node.associations[assn_type].forEach(function(assn) {
                                 links.push({
                                     source: node.node_number,
                                     target: data[assn].node_number,
-                                    type: association_type
+                                    type: assn_type
                                 });
                             });
                         }
@@ -98,11 +93,12 @@
                               .call(force.drag);
 
                 node.append("title").text(function(d) {
-                    var description = "name: " + d.name + "\r\n"
+                    var description = d.name + '\r\n';
 
-                    for (var attr in d) {
-                        if (d[attr].length > 0) {
-                            description += attr + ": " + d[attr] + "\r\n";
+                    for (var attr in d.schema_info) {
+                        description += '\r\n';
+                        if (d.schema_info[attr].length > 0) {
+                            description += attr + ": " + d.schema_info[attr].join(', ');
                         }
                     }
 
