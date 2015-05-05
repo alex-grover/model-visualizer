@@ -96,9 +96,8 @@
                     var description = d.name + '\r\n';
 
                     for (var attr in d.schema_info) {
-                        description += '\r\n';
                         if (d.schema_info[attr].length > 0) {
-                            description += attr + ": " + d.schema_info[attr].join(', ');
+                            description += '\r\n' + attr + ": " + d.schema_info[attr].join(', ');
                         }
                     }
 
