@@ -8,12 +8,12 @@ class ModelParser
         @models = models
     end
 
-    def parse
-        unless Dir.exists? 'app/models/'
-            abort 'app/models/ directory does not exist! Make sure you are in the root directory of your Rails project.'
+    def parse(root)
+        unless Dir.exists? File.join(root, 'app/models/')
+            abort 'app/models/ directory does not exist! Run from or pass the root directory of your Rails project.'
         end
 
-        files = Dir['app/models/**/*.rb']
+        files = Dir[File.join(root, 'app/models/**/*.rb')]
         curr_model = nil
 
         # TODO: maybe factor this out into a parent class?
