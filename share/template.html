@@ -17,25 +17,27 @@
 
                 // Create node array and number each one
                 var i = 0;
-                for (var key in data) {
-                  if (data.hasOwnProperty(key)) {
-                    data[key].node_number = i++;
-                    var obj = {};
-                    obj.name = key;
-                    obj.group = 1;
-                    for (var schema_piece in data[key].schema_info) {
-                      if (data[key].schema_info[schema_piece] != []) {
-                        obj[schema_piece] = data[key].schema_info[schema_piece];
-                      }
+                for (var name in data) {
+                    if (data.hasOwnProperty(name)) {
+                        node = data[name];
+                        node.node_number = i++;
+                        var obj = {
+                            name: name,
+                            group: 1
+                        };
+                        for (var attr in node.schema_info) {
+                            if (node.schema_info[attr] !== []) {
+                                obj[attr] = node.schema_info[attr];
+                            }
+                        }
+                        nodes.push(obj);
                     }
-                    nodes.push(obj);
-                  }
-                } 
+                }
 
                 // Create links array using associations
-                for (var key in data) {
-                    if (data.hasOwnProperty(key)) {
-                        node = data[key];
+                for (var name in data) {
+                    if (data.hasOwnProperty(name)) {
+                        node = data[name];
                         for (var association_type in node.associations) {
                             node.associations[association_type].forEach(function(assn) {
                                 links.push({
@@ -95,35 +97,16 @@
                               .style("fill", function(d) { return color(d.group); })
                               .call(force.drag);
 
-                node.append("title").text(function(d) { var s1 = "";
-                  var s1 = s1.concat("name: " + d.name + "\r\n" + "group: " + d.group + "\r\n");
-                  if (d.integer_attributes.length >= 1) { 
-                    var s1 = s1.concat("integer_attributes: " + d.integer_attributes + "\r\n"); }
-                  if (d.string_attributes.length >= 1) { 
-                    var s1 = s1.concat("string_attributes: " + d.string_attributes + "\r\n"); }
-                  if (d.primary_key_attributes.length >= 1) { 
-                    var s1 = s1.concat("primary_key_attributes: " + d.primary_key_attributes + "\r\n"); }
-                  if (d.text_attributes.length >= 1) { 
-                    var s1 = s1.concat("text_attributes: " + d.text_attributes + "\r\n"); }
-                  if (d.float_attributes.length >= 1) { 
-                    var s1 = s1.concat("float_attributes: " + d.float_attributes + "\r\n"); }
-                  if (d.decimal_attributes.length >= 1) { 
-                    var s1 = s1.concat("decimal_attributes: " + d.decimal_attributes + "\r\n"); }
-                  if (d.date_attributes.length >= 1) { 
-                    var s1 = s1.concat("date_attributes: " + d.date_attributes + "\r\n"); }
-                  if (d.datetime_attributes.length >= 1) { 
-                    var s1 = s1.concat("datetime_attributes: " + d.datetime_attributes + "\r\n"); }
-                  if (d.time_attributes.length >= 1) { 
-                    var s1 = s1.concat("time_attributes: " + d.time_attributes + "\r\n"); }
-                  if (d.timestamp_attributes.length >= 1) { 
-                    var s1 = s1.concat("timestamp_attributes: " + d.timestamp_attributes + "\r\n"); }
-                  if (d.binary_attributes.length >= 1) { 
-                    var s1 = s1.concat("binary_attributes: " + d.binary_attributes + "\r\n"); }
-                  if (d.boolean_attributes.length >= 1) { 
-                    var s1 = s1.concat("boolean_attributes: " + d.boolean_attributes + "\r\n"); }
-                  if (d.foreign_keys.length >= 1) { 
-                    var s1 = s1.concat("foreign_keys: " + d.foreign_keys + "\r\n"); }
-                  return s1;
+                node.append("title").text(function(d) {
+                    var description = "name: " + d.name + "\r\n"
+
+                    for (var attr in d) {
+                        if (d[attr].length > 0) {
+                            description += attr + ": " + d[attr] + "\r\n";
+                        }
+                    }
+
+                    return description;
                 });
 
                 force.on("tick", function() {
