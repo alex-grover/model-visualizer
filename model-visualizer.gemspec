@@ -12,7 +12,8 @@ Gem::Specification.new do |s|
                    "lib/model-visualizer/visualizer.rb",
                    "lib/model-visualizer/model.rb",
                    "lib/model-visualizer/model-parser.rb",
-                   "lib/model-visualizer/schema-parser.rb"]
+                   "lib/model-visualizer/schema-parser.rb",
+                   "share/template.html"]
   s.homepage    = 'http://rubygems.org/gems/model-visualizer'
   s.license     = 'ISC'
   s.add_runtime_dependency 'activesupport'
