@@ -3,134 +3,25 @@
 require 'json'
 
 class Visualizer
-    FILE_PATH = 'modelVisualizer.html'
+    FILE_PATH = 'model-visualizer.html'
 
     def initialize(models)
         @models = models
     end
 
     def create_visualization
-        fileHtml = File.new(FILE_PATH, 'w+')
+        # Get file from gem directory
+        g = Gem::Specification.find_by_name 'model-visualizer'
+        template = File.join(g.full_gem_path, 'share/template.html')
+        d3 = File.join(g.full_gem_path, 'share/d3.min.js')
 
-        fileHtml.puts '
-        <!DOCTYPE html>
-        <html lang="en-US">
-            <head>
-                <title>Rails Model Visualizer</title>
-                <meta charset="utf-8">
-                <link rel="stylesheet" type="text/css" href="main.css">
-                <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
-            </head>
+        # Insert data into file
+        template_contents = File.read template
+        output = template_contents.gsub(/<%= @models %>/, JSON.generate(@models))
+                                  .gsub(/<%= @d3 %>/, d3)
 
-            <body>
-                <script>
-                    (function() {
-                        var data = ' + JSON.generate(@models) + ';
-                        var nodes = [];
-                        var links = [];
-
-                        // Create node array and number each one
-                        var i = 0;
-                        for (var key in data) {
-                            if (data.hasOwnProperty(key)) {
-                                data[key].node_number = i++;
-                                nodes.push({
-                                    name: key,
-                                    group: 1
-                                });
-                            }
-                        }
-
-                        // Create links array using associations
-                        for (var key in data) {
-                            if (data.hasOwnProperty(key)) {
-                                node = data[key];
-                                for (var association_type in node.associations) {
-                                    node.associations[association_type].forEach(function(assn) {
-                                        links.push({
-                                            source: node.node_number,
-                                            target: data[assn].node_number,
-                                            type: association_type
-                                        });
-                                    });
-                                }
-                            }
-                        }
-
-                        var width = window.innerWidth,
-                            height = window.innerHeight;
-
-                        var color = d3.scale.category20();
-
-                        var force = d3.layout
-                                      .force()
-                                      .charge(-400)
-                                      .linkDistance(120)
-                                      .size([width, height]);
-
-                        var svg = d3.select("body")
-                                    .append("svg")
-                                    .attr("width", width)
-                                    .attr("height", height);
-
-                        force.nodes(nodes)
-                             .links(links)
-                             .start();
-
-                        var link = svg.selectAll(".link")
-                                      .data(links)
-                                      .enter().append("line")
-                                      .attr("class", "link")
-                                      .style("stroke", function(d) {
-                                          switch(d.type) {
-                                              case "belongs_to":
-                                                  return "#000";
-                                              case "has_and_belongs_to_many":
-                                                  return "#f00";
-                                              case "has_many":
-                                                  return "#0f0";
-                                              case "has_one":
-                                                  return "#00f";
-                                              default:
-                                                  return "#999";
-                                          }
-                                      }).style("stroke-width", function(d) { return Math.sqrt(d.value); });
-
-                        var node = svg.selectAll(".node")
-                                      .data(nodes)
-                                      .enter().append("circle")
-                                      .attr("class", "node")
-                                      .attr("r", 20)
-                                      .style("fill", function(d) { return color(d.group); })
-                                      .call(force.drag);
-                        
-
-
-                        node.append("title")
-                            .text(function(d) { return d.name; });
-
-                        force.on("tick", function() {
-                            link.attr("x1", function(d) { return d.source.x; })
-                                .attr("y1", function(d) { return d.source.y; })
-                                .attr("x2", function(d) { return d.target.x; })
-                                .attr("y2", function(d) { return d.target.y; });
-
-                            node.attr("cx", function(d) { return d.x; })
-                                .attr("cy", function(d) { return d.y; });
-                        });
-
-						d3.selectAll("circle").transition()
-    						.duration(750)
-    						.delay(function(d, i) { return i * 10; })
-    						.attr("r", function(d) { return Math.sqrt(d * scale); 
-    					});
-						
-                    })();
-                </script>
-            </body>
-        </html>'
-        fileHtml.close()
-
+        # Write and open file
+        File.open(FILE_PATH, 'w') {|file| file.puts output}
         self.launch_browser FILE_PATH
     end
 
