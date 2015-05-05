@@ -25,25 +25,25 @@ class ModelParser
                 end
 
                 line.strip!
-                if line.start_with? 'class'
-                    name = /class ([[:alpha:]]+)/.match(line)[1]
+                if !(/^class ([[:alpha:]]+) < ActiveRecord::Base/.match(line)).nil?
+                    name = /^class ([[:alpha:]]+) < ActiveRecord::Base/.match(line)[1] 
                     curr_model = Model.new(name)
                     @models[name] = curr_model
 
-                elsif line.start_with? 'has_many'
-                    model_neighbor = /has_many :(\w+)/.match(line)[1]
+                elsif !(/^has_many :(\w+)/.match(line)).nil?
+                    model_neighbor = /^has_many :(\w+)/.match(line)[1]
                     curr_model.add_has_many fix_case(model_neighbor)
 
-                elsif line.start_with? 'has_one'
-                    model_neighbor = /has_one :(\w+)/.match(line)[1]
+                elsif !(/^has_one :(\w+)/.match(line)).nil?
+                    model_neighbor = /^has_one :(\w+)/.match(line)[1]
                     curr_model.add_has_one fix_case(model_neighbor)
 
-                elsif line.start_with? 'has_and_belongs_to_many'
-                    model_neighbor = /has_and_belongs_to_many :(\w+)/.match(line)[1]
+                elsif !(/^has_and_belongs_to_many :(\w+)/.match(line)).nil?
+                    model_neighbor = /^has_and_belongs_to_many :(\w+)/.match(line)[1]
                     curr_model.add_has_and_belongs_to_many fix_case(model_neighbor)
 
-                elsif line.start_with? 'belongs_to'
-                    model_neighbor = /belongs_to :(\w+)/.match(line)[1]
+                elsif !(/^belongs_to :(\w+)/.match(line)).nil?
+                    model_neighbor = /^belongs_to :(\w+)/.match(line)[1]
                     curr_model.add_belongs_to fix_case(model_neighbor)
                 end
             end
