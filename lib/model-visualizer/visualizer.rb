@@ -18,17 +18,7 @@ class Visualizer
             <head>
                 <title>Rails Model Visualizer</title>
                 <meta charset="utf-8">
-                <style>
-                    .node {
-                        stroke: #fff;
-                        stroke-width: 1.5px;
-                    }
-
-                    .link {
-                        stroke: #999;
-                        stroke-opacity: .6;
-                    }
-                </style>
+                <link rel="stylesheet" type="text/css" href="main.css">
                 <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
             </head>
 
@@ -67,15 +57,15 @@ class Visualizer
                             }
                         }
 
-                        var width = 960,
-                            height = 500;
+                        var width = window.innerWidth,
+                            height = window.innerHeight;
 
                         var color = d3.scale.category20();
 
                         var force = d3.layout
                                       .force()
-                                      .charge(-120)
-                                      .linkDistance(30)
+                                      .charge(-400)
+                                      .linkDistance(120)
                                       .size([width, height]);
 
                         var svg = d3.select("body")
@@ -110,7 +100,7 @@ class Visualizer
                                       .data(nodes)
                                       .enter().append("circle")
                                       .attr("class", "node")
-                                      .attr("r", 5)
+                                      .attr("r", 20)
                                       .style("fill", function(d) { return color(d.group); })
                                       .call(force.drag);
 
