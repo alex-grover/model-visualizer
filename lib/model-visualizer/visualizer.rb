@@ -13,10 +13,12 @@ class Visualizer
         # Get file from gem directory
         g = Gem::Specification.find_by_name 'model-visualizer'
         template = File.join(g.full_gem_path, 'share/template.html')
+        d3 = File.join(g.full_gem_path, 'share/d3.min.js')
 
         # Insert data into file
         template_contents = File.read template
         output = template_contents.gsub(/<%= @models %>/, JSON.generate(@models))
+                                  .gsub(/<%= @d3 %>/, d3)
 
         # Write and open file
         File.open(FILE_PATH, 'w') {|file| file.puts output}
