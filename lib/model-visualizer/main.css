@@ -7,3 +7,10 @@
     stroke: #999;
     stroke-opacity: .6;
 }
+.node-label {
+  fill: #777;
+  fill-opacity: .5;
+  font-size: 20px;
+  font-weight: 300;
+  text-anchor: middle;
+}

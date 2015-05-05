@@ -103,6 +103,8 @@ class Visualizer
                                       .attr("r", 20)
                                       .style("fill", function(d) { return color(d.group); })
                                       .call(force.drag);
+                        
+
 
                         node.append("title")
                             .text(function(d) { return d.name; });
@@ -116,6 +118,13 @@ class Visualizer
                             node.attr("cx", function(d) { return d.x; })
                                 .attr("cy", function(d) { return d.y; });
                         });
+
+						d3.selectAll("circle").transition()
+    						.duration(750)
+    						.delay(function(d, i) { return i * 10; })
+    						.attr("r", function(d) { return Math.sqrt(d * scale); 
+    					});
+						
                     })();
                 </script>
             </body>
