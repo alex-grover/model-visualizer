@@ -10,14 +10,15 @@ class SchemaParser
         @models = models
     end
 
-    def parse
-        unless File.file? SCHEMA_FILE
-            abort 'db/schema.rb does not exist! Make sure you are in the root directory of your Rails project.'
+    def parse(root)
+        file = File.join(root, SCHEMA_FILE)
+        unless File.file? file
+            abort 'db/schema.rb does not exist! Run from or pass the root directory of your Rails project.'
         end
 
         curr_model = nil
 
-        IO.foreach(SCHEMA_FILE) do |line|
+        IO.foreach(file) do |line|
             if line.include? 'create_table'
                 name = /"([a-zA-Z_]+)"/.match(line)[1]
                 fixed_name = fix_case(name)

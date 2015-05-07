@@ -14,29 +14,32 @@
                 var data = <%= @models %>;
                 var nodes = [];
                 var links = [];
+                var node;
 
                 // Create node array and number each one
                 var i = 0;
-                for (var key in data) {
-                    if (data.hasOwnProperty(key)) {
-                        data[key].node_number = i++;
+                for (var name in data) {
+                    if (data.hasOwnProperty(name)) {
+                        node = data[name];
+                        node.node_number = i++;
                         nodes.push({
-                            name: key,
-                            group: 1
+                            name: name,
+                            group: 1,
+                            schema_info: node.schema_info
                         });
                     }
                 }
 
                 // Create links array using associations
-                for (var key in data) {
-                    if (data.hasOwnProperty(key)) {
-                        node = data[key];
-                        for (var association_type in node.associations) {
-                            node.associations[association_type].forEach(function(assn) {
+                for (var name in data) {
+                    if (data.hasOwnProperty(name)) {
+                        node = data[name];
+                        for (var assn_type in node.associations) {
+                            node.associations[assn_type].forEach(function(assn) {
                                 links.push({
                                     source: node.node_number,
                                     target: data[assn].node_number,
-                                    type: association_type
+                                    type: assn_type
                                 });
                             });
                         }
@@ -81,33 +84,37 @@
                                           return "#999";
                                   }
                               }).style("stroke-width", function(d) { return Math.sqrt(d.value); });
-
-                // var node = svg.selectAll(".node")
-                //   .data(nodes)
-                //   .enter().append("circle")
-                //   .attr("class", "node")
-                //   .attr("r", 15)
-                //   .style("fill", function(d) { return color(d.group); })
-                //   .call(force.drag);
-                // node.append("title")
-                //   .text(function(d) { return d.name; });
-
-                // Create the groups under svg
+                
+                // Create the node groups under svg
                 var gnodes = svg.selectAll('g.gnode')
                   .data(nodes)
                   .enter()
                   .append('g')
                   .classed('gnode', true);
 
-                // Add one circle in each group
-                var node = gnodes.append("circle")
+                // Add circle to each group
+                node = gnodes.append("circle")
                   .attr("class", "node")
                   .attr("r", 15)
                   .style("fill", function(d) { return color(d.group); })
                   .call(force.drag);
-                // Append the labels to each group
+                
+                // Append labels to each group
                 var labels = gnodes.append("text")
                   .text(function(d) { return d.name; });
+
+                // Show model attributes on hover
+                node.append("title").text(function(d) {
+                    var description = d.name + '\r\n';
+
+                    for (var attr in d.schema_info) {
+                        if (d.schema_info[attr].length > 0) {
+                            description += '\r\n' + attr + ": " + d.schema_info[attr].join(', ');
+                        }
+                    }
+
+                    return description;
+                });
 
                 force.on("tick", function() {
                     link.attr("x1", function(d) { return d.source.x; })

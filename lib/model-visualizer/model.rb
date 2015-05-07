@@ -109,30 +109,66 @@ class Model
     end
 
     def to_json(options = {})
-        {
+        json = {
             'name' => @name,
-            'associations' => {
-                'belongs_to' => @belongs_to,
-                'has_one' => @has_one,
-                'has_many' => @has_many,
-                'has_and_belongs_to_many' => @has_and_belongs_to_many
-            },
-            'schema_info' => {
-                'integer_attributes' => @integer_attributes,
-                'string_attributes' => @string_attributes,
-                'primary_key_attributes' => @primary_key_attributes,
-                'text_attributes' => @text_attributes,
-                'float_attributes' => @float_attributes,
-                'decimal_attributes' => @decimal_attributes,
-                'date_attributes' => @date_attributes,
-                'datetime_attributes' => @datetime_attributes,
-                'time_attributes' => @time_attributes,
-                'timestamp_attributes' => @timestamp_attributes,
-                'binary_attributes' => @binary_attributes,
-                'boolean_attributes' => @boolean_attributes,
-                'foreign_keys' => @foreign_keys
-            }
-        }.to_json
+            'associations' => {},
+            'schema_info' => {}
+        }
+
+        if not @belongs_to.empty?
+            json['associations']['belongs_to'] = @belongs_to
+        end
+        if not @has_one.empty?
+            json['associations']['has_one'] = @has_one
+        end
+        if not @has_many.empty?
+            json['associations']['has_many'] = @has_many
+        end
+        if not @has_and_belongs_to_many.empty?
+            json['associations']['has_and_belongs_to_many'] = @has_and_belongs_to_many
+        end
+
+        if not @integer_attributes.empty?
+            json['schema_info']['integer_attributes'] = @integer_attributes
+        end
+        if not @string_attributes.empty?
+            json['schema_info']['string_attributes'] = @string_attributes
+        end
+        if not @primary_key_attributes.empty?
+            json['schema_info']['primary_key_attributes'] = @primary_key_attributes
+        end
+        if not @text_attributes.empty?
+            json['schema_info']['text_attributes'] = @text_attributes
+        end
+        if not @float_attributes.empty?
+            json['schema_info']['float_attributes'] = @float_attributes
+        end
+        if not @decimal_attributes.empty?
+            json['schema_info']['decimal_attributes'] = @decimal_attributes
+        end
+        if not @date_attributes.empty?
+            json['schema_info']['date_attributes'] = @date_attributes
+        end
+        if not @datetime_attributes.empty?
+            json['schema_info']['datetime_attributes'] = @datetime_attributes
+        end
+        if not @time_attributes.empty?
+            json['schema_info']['time_attributes'] = @time_attributes
+        end
+        if not @timestamp_attributes.empty?
+            json['schema_info']['timestamp_attributes'] = @timestamp_attributes
+        end
+        if not @binary_attributes.empty?
+            json['schema_info']['binary_attributes'] = @binary_attributes
+        end
+        if not @boolean_attributes.empty?
+            json['schema_info']['boolean_attributes'] = @boolean_attributes
+        end
+        if not @foreign_keys.empty?
+            json['schema_info']['foreign_keys'] = @foreign_keys
+        end
+
+        json.to_json
     end
 
 end
