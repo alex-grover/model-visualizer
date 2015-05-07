@@ -1,6 +1,9 @@
 # Output file
 modelVisualizer.html
 
+# rails testing app directory
+/app
+
 *.gem
 *.rbc
 /.config
