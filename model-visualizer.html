@@ -19,14 +19,14 @@
           }
           </style>
           !-->
-        <script src="<%= @d3 %>" charset="utf-8"></script>
+        <script src="/Library/Ruby/Gems/2.0.0/gems/model-visualizer-0.0.1/share/d3.min.js" charset="utf-8"></script>
     </head>
 
     <body>
         <script>
             (function() {
                 // Model data is inserted from visualizer.rb
-                var data = <%= @models %>;
+                var data = {"Changeset":{"name":"Changeset","associations":{"belongs_to":["Project","Story"]},"schema_info":{"datetime_attributes":["created_at","updated_at"],"foreign_keys":["story_id","project_id"]}},"Note":{"name":"Note","associations":{"belongs_to":["User","Story"]},"schema_info":{"text_attributes":["note"],"datetime_attributes":["created_at","updated_at"],"foreign_keys":["user_id","story_id"]}},"Project":{"name":"Project","associations":{"has_many":["Story","Changeset"],"has_and_belongs_to_many":["User"]},"schema_info":{"integer_attributes":["iteration_start_day","iteration_length","default_velocity"],"string_attributes":["name","point_scale"],"date_attributes":["start_date"],"datetime_attributes":["created_at","updated_at"]}},"Story":{"name":"Story","associations":{"belongs_to":["Project"],"has_many":["Changeset","Note"]},"schema_info":{"integer_attributes":["estimate","requested_by_id","owned_by_id"],"string_attributes":["title","story_type","state","labels"],"text_attributes":["description"],"decimal_attributes":["position"],"date_attributes":["accepted_at"],"datetime_attributes":["created_at","updated_at"],"foreign_keys":["project_id"]}},"User":{"name":"User","associations":{"has_and_belongs_to_many":["Project"]},"schema_info":{"integer_attributes":["sign_in_count"],"string_attributes":["email","encrypted_password","reset_password_token","remember_token","current_sign_in_ip","last_sign_in_ip","confirmation_token","password_salt","name","initials","locale"],"datetime_attributes":["remember_created_at","current_sign_in_at","last_sign_in_at","confirmed_at","confirmation_sent_at","created_at","updated_at","reset_password_sent_at"],"boolean_attributes":["email_delivery","email_acceptance","email_rejection"]}},"ProjectsUser":{"name":"ProjectsUser","associations":{},"schema_info":{"foreign_keys":["project_id","user_id"]}}};
                 var nodes = [];
                 var links = [];
                 var node;
