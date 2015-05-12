@@ -36,11 +36,15 @@
                         node = data[name];
                         for (var assn_type in node.associations) {
                             node.associations[assn_type].forEach(function(assn) {
-                                links.push({
-                                    source: node.node_number,
-                                    target: data[assn].node_number,
-                                    type: assn_type
-                                });
+                                if (assn in data) {
+                                    links.push({
+                                        source: node.node_number,
+                                        target: data[assn].node_number,
+                                        type: assn_type
+                                    });
+                                } else {
+                                    console.log('ERROR: association not found. ' + name + ' -> ' + assn)
+                                }
                             });
                         }
                     }
