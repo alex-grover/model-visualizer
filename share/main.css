@@ -4,10 +4,12 @@
     fill: #6495ed;
 }
 
-.link {
-    stroke: #999;
-    stroke-opacity: .6;
-}
+path.link {
+  fill: none;
+  stroke: #666;
+  stroke-width: 1.5px;
+  stroke-opacity: .6;
+} 
 
 circle {
   fill: #6495ed;
@@ -18,4 +20,12 @@ circle {
 text {
   font: 11px sans-serif;
   pointer-events: none;
+}
+
+.legend {
+  font-size: 12px;
+}
+
+rect {
+  stroke-width: 2;
 }

@@ -31,6 +31,17 @@
                 var links = [];
                 var node;
 
+                var markerWidth = 8,
+                    markerHeight = 8,
+                    cRadius = 30, // play with the cRadius value
+                    refX = cRadius + (markerWidth / 2),
+                    //refY = -Math.sqrt(cRadius),
+                    refY = -Math.sqrt(cRadius / 2),
+                    drSub = cRadius - refY;
+
+                var legendRectSize = 18;
+                var legendSpacing = 4;
+
                 // Create node array and number each one
                 var i = 0;
                 for (var name in data) {
@@ -64,55 +75,78 @@
                 var width = window.innerWidth,
                     height = window.innerHeight;
 
-                var color = d3.scale.category20();
-
-                var force = d3.layout
-                              .force()
-                              .charge(-450)
-                              .linkDistance(200)
-                              .size([width, height]);
-
                 var svg = d3.select("body")
                             .append("svg")
                             .attr("width", width)
                             .attr("height", height);
 
-                force.nodes(nodes)
-                     .links(links)
-                     .start();
+                var color = d3.scale.category20();
 
-                var link = svg.selectAll(".link")
-                              .data(links)
-                              .enter().append("line")
-                              .attr("class", "link")
-                              .style("stroke", function(d) {
-                                  switch(d.type) {
-                                      case "belongs_to":
-                                          return "#000";
-                                      case "has_and_belongs_to_many":
-                                          return "#f00";
-                                      case "has_many":
-                                          return "#0f0";
-                                      case "has_one":
-                                          return "#00f";
-                                      default:
-                                          return "#999";
-                                  }
-                              }).style("stroke-width", function(d) { return Math.sqrt(d.value); });
+                var force = d3.layout.force()
+                  .size([width, height])
+                  .nodes(d3.values(nodes))
+                  .links(links)
+                  .gravity(0.1)
+                  .charge(-1000)
+                  .linkDistance(200)
+                  .linkStrength(0.9)
+                  .start();
+
+                
+
+                // build the arrow.
+                svg.append("svg:defs").selectAll("marker")
+                    .data(["end"])      // Different link/path types can be defined here
+                  .enter().append("svg:marker")    // This section adds in the arrows
+                    .attr("id", String)
+                    .attr("viewBox", "0 -5 10 10")
+                    .attr("refX", refX)
+                    .attr("refY", refY)
+                    .attr("markerWidth", markerWidth)
+                    .attr("markerHeight", markerHeight)
+                    .attr("orient", "auto")
+                  .append("svg:path")
+                    .attr("d", "M0,-5L10,0L0,5");
+
+                // add the links and the arrows
+                var path = svg.append("svg:g").selectAll("path")
+                    .data(force.links())
+                  .enter().append("svg:path")
+                //    .attr("class", function(d) { return "link " + d.type; })
+                    .attr("class", "link")
+                    .style("stroke", function(d) {
+                      switch(d.type) {
+                          case "belongs_to":
+                              return "#000";
+                          case "has_and_belongs_to_many":
+                              return "#f00";
+                          case "has_many":
+                              return "#0f0";
+                          case "has_one":
+                              return "#00f";
+                          default:
+                              return "#999";
+                      }
+                    })
+                    .style("stroke-width", function(d) { return Math.sqrt(d.value); })
+                    .attr("marker-end", "url(#end)");
                 
                 // Create the node groups under svg
                 var gnodes = svg.selectAll('g.gnode')
                   .data(nodes)
                   .enter()
                   .append('g')
+                  .on("mouseover", mouseover)
+                  .on("mouseout", mouseout)
                   .classed('gnode', true);
 
                 // Add circle to each group
                 node = gnodes.append("circle")
                   .attr("class", "node")
-                  .attr("r", function(d){ 
-                    d.radius = d.name.length * 4; 
-                    return d.radius; })
+                  .attr("r", cRadius)
+                  // .attr("r", function(d){ 
+                  //   d.radius = d.name.length * 4; 
+                  //   return d.radius; })
                   // .style("fill", function(d) {
                   //   return color(d.group); })
                   .call(force.drag);
@@ -120,6 +154,7 @@
                 // Append labels to each group
                 var labels = gnodes.append("text")
                   .attr("text-anchor", "middle")
+                  .attr("dy", ".25em")
                   .text(function(d) { return d.name; });
 
                 // Show model attributes on hover
@@ -135,11 +170,51 @@
                     return description;
                 });
 
+                function mouseover() {
+                  d3.select(this).select('text').transition()
+                      .duration(500)
+                      .style("font-size","13px")
+                  d3.select(this).select("circle").transition()
+                      .duration(500)
+                      .attr("r", function(d){ 
+                        return cRadius * 1.1; 
+                      })
+                      .style("fill", function(d) {
+                         return "#90EE90"; 
+                      });
+                }
+
+                function mouseout() {
+                  d3.select(this).select('text').transition()
+                      .duration(500)
+                      .style("font-size","11px")
+                  d3.select(this).select("circle").transition()
+                      .duration(500)
+                      .attr("r", function(d){ 
+                        return cRadius; 
+                      })
+                      .style("fill", function(d) {
+                         return "#6495ED"; 
+                      });
+                }
+
                 force.on("tick", function() {
-                    link.attr("x1", function(d) { return d.source.x; })
-                        .attr("y1", function(d) { return d.source.y; })
-                        .attr("x2", function(d) { return d.target.x; })
-                        .attr("y2", function(d) { return d.target.y; });
+                    path.attr("d", function(d) {
+                      var dx = d.target.x - d.source.x,
+                          dy = d.target.y - d.source.y,
+                          dr = Math.sqrt(dx * dx + dy * dy);
+                      return "M" + 
+                          d.source.x + "," + 
+                          d.source.y + "A" + 
+                          (dr - drSub) + "," + (dr - drSub) + " 0 0,1 " + 
+                          d.target.x + "," + 
+                          d.target.y;
+                      });
+
+                    // link.attr("x1", function(d) { return d.source.x; })
+                    //     .attr("y1", function(d) { return d.source.y; })
+                    //     .attr("x2", function(d) { return d.target.x; })
+                    //     .attr("y2", function(d) { return d.target.y; });
 
                     // Translate the groups
                     gnodes.attr("transform", function(d) { 
