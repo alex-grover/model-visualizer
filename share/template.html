@@ -4,21 +4,6 @@
         <title>Rails Model Visualizer</title>
         <meta charset="utf-8">
         <link rel="stylesheet" type="text/css" href="./share/main.css"/>
-        <!--
-        <style>
-          circle {
-            fill: #ccc;
-            stroke: #333;
-            stroke-width: 1.5px;
-          }
-
-          text {
-            font: 10px sans-serif;
-            pointer-events: none;
-            text-shadow: 0 1px 0 #fff, 1px 0 0 #fff, 0 -1px 0 #fff, -1px 0 0 #fff;
-          }
-          </style>
-          !-->
         <script src="<%= @d3 %>" charset="utf-8"></script>
     </head>
 
@@ -33,10 +18,12 @@
 
                 var markerWidth = 8,
                     markerHeight = 8,
-                    cRadius = 30, // play with the cRadius value
-                    refX = cRadius + (markerWidth / 2),
+                    cRadius = 40, // play with the cRadius value
+                    refX = cRadius + (markerWidth * 2),
                     //refY = -Math.sqrt(cRadius),
-                    refY = -Math.sqrt(cRadius / 2),
+                    refY = -Math.sqrt(cRadius),
+                    maxNodeLabelSize = cRadius * 0.625,
+                    minNodeLabelSize = cRadius * 0.275,
                     drSub = cRadius - refY;
 
                 var legendRectSize = 18;
@@ -86,10 +73,10 @@
                   .size([width, height])
                   .nodes(d3.values(nodes))
                   .links(links)
-                  .gravity(0.1)
-                  .charge(-1000)
+                  //.gravity(0.1)
+                  .charge(-10)
                   .linkDistance(200)
-                  .linkStrength(0.9)
+                  //.linkStrength(0.9)
                   .start();
 
                 
@@ -144,18 +131,16 @@
                 node = gnodes.append("circle")
                   .attr("class", "node")
                   .attr("r", cRadius)
-                  // .attr("r", function(d){ 
-                  //   d.radius = d.name.length * 4; 
-                  //   return d.radius; })
-                  // .style("fill", function(d) {
-                  //   return color(d.group); })
                   .call(force.drag);
                 
                 // Append labels to each group
                 var labels = gnodes.append("text")
+                  .text(function(d) { return d.name; })
                   .attr("text-anchor", "middle")
-                  .attr("dy", ".25em")
-                  .text(function(d) { return d.name; });
+                  .style("font-size", "1px")
+                  .each(getSize)
+                  .style("font-size", function(d) { return d.scale + "px"; })
+                  .attr("dy", function(d) { return (d.scale / 5) + "px"; });
 
                 // Show model attributes on hover
                 node.append("title").text(function(d) {
@@ -170,10 +155,17 @@
                     return description;
                 });
 
+                function getSize(d) {
+                  var bbox = this.getBBox(),
+                      margin = 3.0,
+                      cbbox = this.parentNode.getBBox(),
+                      scale = Math.min(cbbox.width/bbox.width, cbbox.height/bbox.height);
+                  scale = Math.min(scale, maxNodeLabelSize)
+                  scale = Math.max(scale, minNodeLabelSize)
+                  d.scale = (scale - margin);
+                }
+
                 function mouseover() {
-                  d3.select(this).select('text').transition()
-                      .duration(500)
-                      .style("font-size","13px")
                   d3.select(this).select("circle").transition()
                       .duration(500)
                       .attr("r", function(d){ 
@@ -181,13 +173,16 @@
                       })
                       .style("fill", function(d) {
                          return "#90EE90"; 
-                      });
+                      })
+                  d3.select(this).select('text').transition()
+                      .duration(500)
+                      .style("font-size", function(d) { return d.scale * 1.1; });
                 }
 
                 function mouseout() {
                   d3.select(this).select('text').transition()
                       .duration(500)
-                      .style("font-size","11px")
+                      .style("font-size", function(d) { return d.scale; })
                   d3.select(this).select("circle").transition()
                       .duration(500)
                       .attr("r", function(d){ 
