@@ -18,10 +18,9 @@
 
                 var markerWidth = 8,
                     markerHeight = 8,
-                    cRadius = 40, // play with the cRadius value
-                    refX = cRadius + (markerWidth * 2),
-                    //refY = -Math.sqrt(cRadius),
-                    refY = -Math.sqrt(cRadius * 2.1),
+                    cRadius = 30, // play with the cRadius value
+                    refX = cRadius + (markerWidth / 2),
+                    refY = -Math.sqrt(cRadius / 3),
                     maxNodeLabelSize = cRadius * 0.625,
                     minNodeLabelSize = cRadius * 0.275,
                     drSub = cRadius - refY;
@@ -74,7 +73,7 @@
                   .nodes(d3.values(nodes))
                   .links(links)
                   //.gravity(0.1)
-                  .charge(-10)
+                  .charge(-1000)
                   .linkDistance(200)
                   //.linkStrength(0.9)
                   .start();
