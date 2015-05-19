@@ -5,9 +5,43 @@
         <meta charset="utf-8">
         <!-- d3 3.5.5 included from gem directory -->
         <script src="<%= @d3 %>" charset="utf-8"></script>
+        <link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
+        <style type="text/css">
+            body {
+                font-family: 'Open Sans', sans-serif;
+            }
+            .sidebar {
+                position: fixed;
+                left: 0;
+                top: 0;
+                height: 100%;
+                overflow: scroll;
+                border-right: 1px solid #999;
+                width: 18%;
+                color: #222;
+                background-color: #eee;
+            }
+            .sidebar > div {
+                padding: 7px 15px;
+            }
+            .sidebar input {
+                width: 100%;
+                font-size: 16px;
+            }
+            .sidebar > .model {
+                font-size: 20px;
+                cursor: pointer;
+            }
+            .sidebar > .model:hover {
+                background-color: #2980b9;
+                color: #eee;
+            }
+        </style>
     </head>
 
     <body>
+        <%= @sidebar %>
+
         <script>
             (function() {
                 // Model data is inserted from visualizer.rb
@@ -133,6 +167,23 @@
                     // node.attr("cx", function(d) { return d.x; })
                     //     .attr("cy", function(d) { return d.y; });
                 });
+
+                // Search functionality for sidebar
+                var searchdiv = document.getElementsByClassName('sidebar')[0].firstChild;
+                var searchfield = searchdiv.firstChild;
+                searchfield.oninput = function() {
+                    var sidebarentries = document.getElementsByClassName('model');
+                    var search = searchfield.value.toLowerCase();
+                    for (var i = 0; i < sidebarentries.length; i++) {
+                        var entry = sidebarentries[i];
+                        var html = entry.innerHTML.toLowerCase();
+                        if (html.indexOf(search) == -1) {
+                            entry.style.display = 'none';
+                        } else {
+                            entry.style.display = 'block';
+                        }
+                    }
+                }
             })();
         </script>
     </body>
