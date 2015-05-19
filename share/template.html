@@ -4,7 +4,11 @@
         <title>Rails Model Visualizer</title>
         <meta charset="utf-8">
         <!-- d3 3.5.5 included from gem directory -->
-        <script src="<%= @d3 %>" charset="utf-8"></script>
+        <script type='text/javascript' src="http://code.jquery.com/jquery-1.11.3.min.js"> </script>
+        <link href="http://code.jquery.com/ui/1.10.2/themes/smoothness/jquery-ui.css" rel="Stylesheet"></link>
+        <script src="http://code.jquery.com/ui/1.10.2/jquery-ui.js" ></script>
+        <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+        <script type='text/javascript' src="http://bost.ocks.org/mike/fisheye/fisheye.js?0.0.3"> </script>
         <link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
         <style type="text/css">
             body {
@@ -36,6 +40,49 @@
                 background-color: #2980b9;
                 color: #eee;
             }
+
+            .link {
+              fill: none;
+              stroke: #999;
+            }
+
+            .link.belongs_to {
+              stroke: #000;
+            }
+
+            #belongs_to {
+              fill: #000;
+            }
+
+            .link.has_and_belongs_to_many {
+              stroke: #f00;
+            }
+
+            #has_and_belongs_to_many {
+              fill: #f00;
+            }
+
+            .link.has_many {
+              stroke: #0f0;
+            }
+
+            #has_many {
+              fill: #0f0;
+            }
+
+            .link.has_one {
+              stroke: #00f;
+            }
+
+            #has_one {
+              fill: #00f;
+            }
+
+            text {
+              font: 10px sans-serif;
+              pointer-events: none;
+              text-shadow: 0 1px 0 #fff, 1px 0 0 #fff, 0 -1px 0 #fff, -1px 0 0 #fff;
+            }
         </style>
     </head>
 
@@ -44,6 +91,7 @@
 
         <script>
             (function() {
+
                 // Model data is inserted from visualizer.rb
                 var data = <%= @models %>;
                 var nodes = [];
@@ -84,89 +132,269 @@
                     }
                 }
 
+                // Initialize window
                 var width = window.innerWidth,
                     height = window.innerHeight;
 
                 var color = d3.scale.category20();
 
-                var force = d3.layout
-                              .force()
-                              .charge(-450)
-                              .linkDistance(150)
-                              .size([width, height]);
-
+                // Create an SVG to hold zoom functionality
                 var svg = d3.select("body")
-                            .append("svg")
-                            .attr("width", width)
-                            .attr("height", height);
+                    .append("svg")
+                      .attr("width", width)
+                      .attr("height", height)
+                      .attr("viewBox", "0 0 " + width + " " + height )
+                      .attr("pointer-events", "all")
+                    .call(d3.behavior.zoom().on("zoom", redraw));
 
-                force.nodes(nodes)
-                     .links(links)
-                     .start();
+                var vis = svg
+                    .append('svg:g');
 
-                var link = svg.selectAll(".link")
-                              .data(links)
-                              .enter().append("line")
-                              .attr("class", "link")
-                              .style("stroke", function(d) {
-                                  switch(d.type) {
-                                      case "belongs_to":
-                                          return "#000";
-                                      case "has_and_belongs_to_many":
-                                          return "#f00";
-                                      case "has_many":
-                                          return "#0f0";
-                                      case "has_one":
-                                          return "#00f";
-                                      default:
-                                          return "#999";
-                                  }
-                              }).style("stroke-width", function(d) { return Math.sqrt(d.value); });
+                function redraw() {
+                  vis.attr("transform",
+                      "translate(" + d3.event.translate + ")"
+                      + " scale(" + d3.event.scale + ")");
+                }
 
-                // Create the node groups under svg
-                var gnodes = svg.selectAll('g.gnode')
-                                .data(nodes)
-                                .enter()
-                                .append('g')
-                                .classed('gnode', true);
+                // Initialize force for graph
+                var force = d3.layout.force()
+                              .nodes(nodes)
+                              .links(links)
+                              .charge(-300)
+                              .linkDistance(80)
+                              .size([width, height])
+                              .on("tick", tick)
+                              .start();
 
-                // Add circle to each group
-                node = gnodes.append("circle")
-                             .attr("class", "node")
-                             .attr("r", 15)
-                             .style("fill", function(d) { return color(d.group); })
-                             .call(force.drag);
+                // Start pin down node on drag
+                //
+                var node_drag = d3.behavior.drag()
+                    .on("dragstart", dragstart)
+                    .on("drag", dragmove)
+                    .on("dragend", dragend);
 
-                // Append labels to each group
-                var labels = gnodes.append("text")
-                                   .text(function(d) { return d.name; });
+                function dragstart(d, i) {
+                    force.stop() // stops auto positioning
+                }
+
+                function dragmove(d, i) {
+                    d.px += d3.event.dx;
+                    d.py += d3.event.dy;
+                    d.x += d3.event.dx;
+                    d.y += d3.event.dy;
+                }
+
+                function dragend(d, i) {
+                    d.fixed = true; // set node to fixed so  force doesn't include in auto positioning
+                    force.resume();
+                }
+
+                function releasenode(d) {
+                    d.fixed = false;
+                }
+                //
+                // End pin down node on drag
+
+                // Start paths and nodes
+                //
+                // Adding directed links
+                vis.append("defs").selectAll("marker")
+                  .data(["belongs_to", "has_and_belongs_to_many", "has_many", "has_one"])
+                  .enter().append("marker")
+                    .attr("id", function(d) { return d; })
+                    .attr("viewBox", "0 -5 10 10")
+                    .attr("refX", 25)
+                    .attr("refY", 0)
+                    .attr("markerWidth", 6)
+                    .attr("markerHeight", 6)
+                    .attr("orient", "auto")
+                  .append("path")                
+                    .attr("d", "M0,-5L10,0L0,5");
+
+                // Adding links
+                var link = vis.append("g").selectAll(".link")
+                    .data(links)
+                  .enter().append("path")
+                    .attr("class", function(d) { return "link " + d.type; })
+                    .attr("marker-end", function(d) { return "url(#" + d.type + ")"; })
+                    .style("stroke-width", function(d) { return Math.sqrt(d.value); });
+
+                // Adding nodes
+                var node = vis.append("g").selectAll(".node")
+                    .data(nodes)
+                  .enter().append("circle")
+                    .attr("class", "node")
+                    .attr("r", 8)
+                    .style("fill", function (d) {
+                      return color(d.group);
+                    })
+                    .on('mousedown', function(d) { d3.event.stopPropagation(); })
+                    .on("dblclick.zoom", function(d) { d3.event.stopPropagation(); })
+                    //.on('dblclick', connectedNodes)
+                    .on('mouseover', connectedNodes)
+                    .on('mouseout', connectedNodes)
+                    .on('click', releasenode)
+                    .call(node_drag);
+                
+                // Adding node labels
+                var text = vis.append("g").selectAll("text")
+                    .data(force.nodes())
+                  .enter().append("text")
+                    .attr("x", 8)
+                    .attr("y", ".31em")
+                    .text(function(d) { return d.name; });
+                //
+                // End paths and nodes
 
                 // Show model attributes on hover
                 node.append("title").text(function(d) {
-                    var description = d.name + '\r\n';
+                  var description = d.name + '\r\n';
+                  for (var attr in d.schema_info) {
+                      if (d.schema_info[attr].length > 0) {
+                          description += '\r\n' + attr + ": " + d.schema_info[attr].join(', ');
+                      }
+                  }
+                  return description;
+                });
 
-                    for (var attr in d.schema_info) {
-                        if (d.schema_info[attr].length > 0) {
-                            description += '\r\n' + attr + ": " + d.schema_info[attr].join(', ');
+                // Resize on window change
+                resize();
+                  d3.select(window).on("resize", resize);
+
+                function resize() {
+                  width = window.innerWidth, height = window.innerHeight;
+                  svg.attr("width", width).attr("height", height);
+                  force.size([width, height]).resume();
+                }
+
+                // Start transformation functions
+                //
+                // Use elliptical arc path segments to doubly-encode directionality.
+                function tick() {
+                  link.attr("d", linkArc);
+                  node.attr("transform", transform);
+                  text.attr("transform", transform);
+                  node.each(collide(0.5));
+                }
+
+                function linkArc(d) {
+                  var dx = d.target.x - d.source.x,
+                      dy = d.target.y - d.source.y,
+                      dr = Math.sqrt(dx * dx + dy * dy);
+                  return "M" + d.source.x + "," + d.source.y + "A" + dr + "," + dr + " 0 0,1 " + d.target.x + "," + d.target.y;
+                }
+
+                function transform(d) {
+                  return "translate(" + d.x + "," + d.y + ")";
+                }
+                //
+                // End transformation functions
+
+                //Code for collision avoidance
+                var padding = 1, // separation between circles
+                    radius=8;
+                function collide(alpha) {
+                  var quadtree = d3.geom.quadtree(nodes);
+                  return function(d) {
+                    var rb = 2*radius + padding,
+                        nx1 = d.x - rb,
+                        nx2 = d.x + rb,
+                        ny1 = d.y - rb,
+                        ny2 = d.y + rb;
+                    quadtree.visit(function(quad, x1, y1, x2, y2) {
+                      if (quad.point && (quad.point !== d)) {
+                        var x = d.x - quad.point.x,
+                            y = d.y - quad.point.y,
+                            l = Math.sqrt(x * x + y * y);
+                          if (l < rb) {
+                          l = (l - rb) / l * alpha;
+                          d.x -= x *= l;
+                          d.y -= y *= l;
+                          quad.point.x += x;
+                          quad.point.y += y;
                         }
-                    }
-
-                    return description;
-                });
-
-                force.on("tick", function() {
-                    link.attr("x1", function(d) { return d.source.x; })
-                        .attr("y1", function(d) { return d.source.y; })
-                        .attr("x2", function(d) { return d.target.x; })
-                        .attr("y2", function(d) { return d.target.y; });
-
-                    // Translate the groups
-                    gnodes.attr("transform", function(d) {
-                        return 'translate(' + [d.x, d.y] + ')';
+                      }
+                      return x1 > nx2 || x2 < nx1 || y1 > ny2 || y2 < ny1;
                     });
-                    // node.attr("cx", function(d) { return d.x; })
-                    //     .attr("cy", function(d) { return d.y; });
+                  };
+                }
+
+                /* Fisheye is not working... implemented zoom.
+                // Fisheye, activate!!!
+                var fisheye = d3.fisheye.circular()
+                  .radius(120)
+
+                svg.on("mousemove", function() {
+                  if(dragging == 0) {
+                    force.stop();
+                    fisheye.focus(d3.mouse(this));
+
+                    d3.selectAll("circle").each(function(d) { d.display = fisheye(d); })
+                        .attr("cx", function(d) { return d.display.x - d.x; })
+                        .attr("cy", function(d) { return d.display.y - d.y; })
+                        .attr("r", function(d) { return d.display.z * 8; });
+
+                    d3.selectAll("text")
+                        .attr("dx", function(d) { return d.display.x - d.x; })
+                        .attr("dy", function(d) { return d.display.y - d.y; });
+
+                    link.attr("d", function(d) {
+
+                        var dx = d.target.display.x - d.source.display.x;
+                        var dy = d.target.display.y - d.source.display.y;
+
+                        var h= Math.sqrt(dx * dx + dy * dy);
+                        var htr = h;
+                        var cos=dx/h;
+                        var sin=dy/h;
+
+                        var dxt = cos*htr+d.source.display.x;
+                        var dyt = sin*htr+d.source.display.y;
+
+                        //clip source to circle radius too
+                        var dxs = cos*d.source.display.r+d.source.display.x;
+                        var dys = sin*d.source.display.r+d.source.display.y;
+
+                        var dx = d.target.display.x - d.source.display.x,
+                            dy = d.target.display.y - d.source.display.y;
+                            dr = Math.sqrt(dx * dx + dy * dy);
+                          return "M" + d.source.display.x + "," + d.source.display.y + "A" + dr + "," + dr + " 0 0,1 " + dxt + "," + dyt;
+                    });
+                  }
                 });
+                // End fisheye code.*/
+
+                //Activate highlighting neighbors on double click
+                var toggle = 0;
+                //Array for neighbors
+                var linkedByIndex = {};
+                for (i = 0; i < nodes.length; i++) {
+                    linkedByIndex[i + "," + i] = 1;
+                };
+                links.forEach(function (d) {
+                    linkedByIndex[d.source.index + "," + d.target.index] = 1;
+                });
+                //Are pair neighbors?
+                function neighboring(a, b) {
+                    return linkedByIndex[a.index + "," + b.index];
+                }
+                function connectedNodes() {
+                    if (toggle == 0) {
+                        //Fade out non-neighbors
+                        d = d3.select(this).node().__data__;
+                        node.style("opacity", function (o) {
+                            return neighboring(d, o) | neighboring(o, d) ? 1 : 0.1;
+                        });
+                        link.style("opacity", function (o) {
+                            return d.index==o.source.index | d.index==o.target.index ? 1 : 0.1;
+                        });
+                        toggle = 1;
+                    } else {
+                        node.style("opacity", 1);
+                        link.style("opacity", 1);
+                        toggle = 0;
+                    }
+                }
 
                 // Search functionality for sidebar
                 var searchdiv = document.getElementsByClassName('sidebar')[0].firstChild;
@@ -188,14 +416,14 @@
                 // Highlight node on click. Must be global.
                 window.highlightNode = function(name) {
                     // Dim all links and all nodes but the one with the given name
-                    svg.selectAll(".gnode").filter(function (d, i) {
+                    vis.selectAll(".node").filter(function (d, i) {
                         return d.name != name;
                     }).style("opacity", "0.1");
-                    svg.selectAll(".link").style("opacity", "0.1");
+                    vis.selectAll(".link").style("opacity", "0.1");
 
                     // TODO: display tooltip and keep everything else dimmed to undim later
-                    d3.selectAll(".gnode, .link").transition()
-                                                 .duration(5000)
+                    d3.selectAll(".node, .link").transition()
+                                                 .duration(1000)
                                                  .style("opacity", "1");
                 }
             })();
