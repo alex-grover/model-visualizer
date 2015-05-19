@@ -1,23 +1,6 @@
 #!/usr/bin/env ruby
 
 class Model
-    attr_reader :belongs_to
-    attr_reader :has_one
-    attr_reader :has_many
-    attr_reader :has_and_belongs_to_many
-    attr_reader :integer_attributes
-    attr_reader :string_attributes
-    attr_reader :primary_key_attributes
-    attr_reader :text_attributes
-    attr_reader :float_attributes
-    attr_reader :decimal_attributes
-    attr_reader :datetime_attributes
-    attr_reader :timestamp_attributes
-    attr_reader :time_attributes
-    attr_reader :date_attributes
-    attr_reader :binary_attributes
-    attr_reader :boolean_attributes
-    attr_reader :foreign_keys
 
     def initialize(name)
         @name = name

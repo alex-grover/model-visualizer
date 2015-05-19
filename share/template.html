@@ -5,9 +5,12 @@
         <meta charset="utf-8">
         <link rel="stylesheet" type="text/css" href="./share/main.css"/>
         <script src="<%= @d3 %>" charset="utf-8"></script>
+        <link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
     </head>
 
     <body>
+        <%= @sidebar %>
+
         <script>
             (function() {
                 // Model data is inserted from visualizer.rb
@@ -50,11 +53,15 @@
                         node = data[name];
                         for (var assn_type in node.associations) {
                             node.associations[assn_type].forEach(function(assn) {
-                                links.push({
-                                    source: node.node_number,
-                                    target: data[assn].node_number,
-                                    type: assn_type
-                                });
+                                if (assn in data) {
+                                    links.push({
+                                        source: node.node_number,
+                                        target: data[assn].node_number,
+                                        type: assn_type
+                                    });
+                                } else {
+                                    console.log('ERROR: association not found. ' + name + ' -> ' + assn)
+                                }
                             });
                         }
                     }
@@ -78,7 +85,7 @@
                   //.linkStrength(0.9)
                   .start();
 
-                
+
 
                 // build the arrow.
                 svg.append("svg:defs").selectAll("marker")
@@ -116,7 +123,7 @@
                     })
                     .style("stroke-width", function(d) { return Math.sqrt(d.value); })
                     .attr("marker-end", "url(#end)");
-                
+
                 // Create the node groups under svg
                 var gnodes = svg.selectAll('g.gnode')
                   .data(nodes)
@@ -131,7 +138,7 @@
                   .attr("class", "node")
                   .attr("r", cRadius)
                   .call(force.drag);
-                
+
                 // Append labels to each group
                 var labels = gnodes.append("text")
                   .text(function(d) { return d.name; })
@@ -192,11 +199,11 @@
                 function mouseover() {
                   d3.select(this).select("circle").transition()
                       .duration(500)
-                      .attr("r", function(d){ 
-                        return cRadius * 1.1; 
+                      .attr("r", function(d){
+                        return cRadius * 1.1;
                       })
                       .style("fill", function(d) {
-                         return "#90EE90"; 
+                         return "#90EE90";
                       })
                   d3.select(this).select('text').transition()
                       .duration(500)
@@ -209,11 +216,11 @@
                       .style("font-size", function(d) { return d.scale; })
                   d3.select(this).select("circle").transition()
                       .duration(500)
-                      .attr("r", function(d){ 
-                        return cRadius; 
+                      .attr("r", function(d){
+                        return cRadius;
                       })
                       .style("fill", function(d) {
-                         return "#6495ED"; 
+                         return "#6495ED";
                       });
                 }
 
@@ -222,11 +229,11 @@
                       var dx = d.target.x - d.source.x,
                           dy = d.target.y - d.source.y,
                           dr = Math.sqrt(dx * dx + dy * dy);
-                      return "M" + 
-                          d.source.x + "," + 
-                          d.source.y + "A" + 
-                          (dr - drSub) + "," + (dr - drSub) + " 0 0,1 " + 
-                          d.target.x + "," + 
+                      return "M" +
+                          d.source.x + "," +
+                          d.source.y + "A" +
+                          (dr - drSub) + "," + (dr - drSub) + " 0 0,1 " +
+                          d.target.x + "," +
                           d.target.y;
                       });
 
@@ -236,12 +243,43 @@
                     //     .attr("y2", function(d) { return d.target.y; });
 
                     // Translate the groups
-                    gnodes.attr("transform", function(d) { 
-                      return 'translate(' + [d.x, d.y] + ')'; 
+                    gnodes.attr("transform", function(d) {
+                        return 'translate(' + [d.x, d.y] + ')';
                     });
                     // node.attr("cx", function(d) { return d.x; })
                     //     .attr("cy", function(d) { return d.y; });
                 });
+
+                // Search functionality for sidebar
+                var searchdiv = document.getElementsByClassName('sidebar')[0].firstChild;
+                var searchfield = searchdiv.firstChild;
+                searchfield.oninput = function() {
+                    var sidebarentries = document.getElementsByClassName('model');
+                    var search = searchfield.value.toLowerCase();
+                    for (var i = 0; i < sidebarentries.length; i++) {
+                        var entry = sidebarentries[i];
+                        var html = entry.innerHTML.toLowerCase();
+                        if (html.indexOf(search) == -1) {
+                            entry.style.display = 'none';
+                        } else {
+                            entry.style.display = 'block';
+                        }
+                    }
+                }
+
+                // Highlight node on click. Must be global.
+                window.highlightNode = function(name) {
+                    // Dim all links and all nodes but the one with the given name
+                    svg.selectAll(".gnode").filter(function (d, i) {
+                        return d.name != name;
+                    }).style("opacity", "0.1");
+                    svg.selectAll(".link").style("opacity", "0.1");
+
+                    // TODO: display tooltip and keep everything else dimmed to undim later
+                    d3.selectAll(".gnode, .link").transition()
+                                                 .duration(5000)
+                                                 .style("opacity", "1");
+                }
             })();
         </script>
     </body>

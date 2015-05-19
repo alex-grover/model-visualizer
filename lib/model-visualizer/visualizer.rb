@@ -19,10 +19,20 @@ class Visualizer
         template_contents = File.read template
         output = template_contents.gsub(/<%= @models %>/, JSON.generate(@models))
                                   .gsub(/<%= @d3 %>/, d3)
+                                  .gsub(/<%= @sidebar %>/, create_sidebar)
 
         # Write and open file
         File.open(FILE_PATH, 'w') {|file| file.puts output}
         self.launch_browser FILE_PATH
+    end
+
+    def create_sidebar
+        str = '<div class="sidebar">'
+        str += '<div class="search"><input type="search" results=5 size="large" placeholder="Search"></div>' # input type="search" does not let you resize in webkit
+        @models.sort.each do |name, model|
+            str += '<div class="model" onclick="highlightNode(this.innerHTML)">' + name + '</div>'
+        end
+        str += '</div>'
     end
 
     # http://stackoverflow.com/questions/152699/open-the-default-browser-in-ruby

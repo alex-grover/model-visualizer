@@ -1,5 +1,8 @@
 # Output file
-modelVisualizer.html
+model-visualizer.html
+
+# rails testing app directory
+/app
 
 # rails testing app directory
 /app
