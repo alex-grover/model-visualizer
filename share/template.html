@@ -184,6 +184,20 @@
                         }
                     }
                 }
+
+                // Highlight node on click. Must be global.
+                window.highlightNode = function(name) {
+                    // Dim all links and all nodes but the one with the given name
+                    svg.selectAll(".gnode").filter(function (d, i) {
+                        return d.name != name;
+                    }).style("opacity", "0.1");
+                    svg.selectAll(".link").style("opacity", "0.1");
+
+                    // TODO: display tooltip and keep everything else dimmed to undim later
+                    d3.selectAll(".gnode, .link").transition()
+                                                 .duration(5000)
+                                                 .style("opacity", "1");
+                }
             })();
         </script>
     </body>
