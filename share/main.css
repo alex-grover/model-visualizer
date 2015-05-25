@@ -1,7 +1,38 @@
+html, body {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
+
+body {
+  background-image: url("background.png");
+  font-family: 'Open Sans', sans-serif;
+  margin: 0;
+  top: 0;
+}
+
+.container {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 18%;
+}
+
+.inner-container {
+  position: absolute;
+  background-color: white;
+  border: 1px solid #999;
+  top: 100px;
+  right: 30px;
+  bottom: 30px;
+  left: 30px;
+}
+
 .node {
-    stroke: #000111;
-    stroke-width: 1.0px;
-    fill: #6495ed;
+  stroke: #000111;
+  stroke-width: 1.0px;
+  fill: #6495ed;
 }
 
 path.link {
@@ -9,7 +40,7 @@ path.link {
   stroke: #666;
   stroke-width: 1.5px;
   stroke-opacity: .6;
-} 
+}
 
 circle {
   fill: #6495ed;
@@ -30,9 +61,6 @@ rect {
   stroke-width: 2;
 }
 
-body {
-  font-family: 'Open Sans', sans-serif;
-}
 .sidebar {
   position: fixed;
   left: 0;

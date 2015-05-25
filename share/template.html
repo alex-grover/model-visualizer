@@ -11,6 +11,12 @@
     <body>
         <%= @sidebar %>
 
+        <div class="container">
+            <div class="inner-container">
+                <!-- SVG will be inserted here -->
+            </div>
+        </div>
+
         <script>
             (function() {
                 // Model data is inserted from visualizer.rb
@@ -67,10 +73,12 @@
                     }
                 }
 
-                var width = window.innerWidth,
-                    height = window.innerHeight;
 
-                var svg = d3.select("body")
+                var container = document.getElementsByClassName("inner-container")[0];
+                var width = container.clientWidth,
+                    height = container.clientHeight;
+
+                var svg = d3.select(".inner-container")
                             .append("svg")
                             .attr("width", width)
                             .attr("height", height);
