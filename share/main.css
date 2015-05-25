@@ -19,6 +19,12 @@ body {
   left: 18%;
 }
 
+.title {
+  margin-top: 30px;
+  text-align: center;
+  font-size: 32px;
+}
+
 .inner-container {
   position: absolute;
   background-color: white;

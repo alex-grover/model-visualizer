@@ -9,7 +9,7 @@ class Visualizer
         @models = models
     end
 
-    def create_visualization
+    def create_visualization(title)
         # Get file from gem directory
         g = Gem::Specification.find_by_name 'model-visualizer'
         template = File.join(g.full_gem_path, 'share/template.html')
@@ -21,6 +21,7 @@ class Visualizer
         output = template_contents.gsub(/<%= @models %>/, JSON.generate(@models))
                                   .gsub(/<%= @css %>/, css)
                                   .gsub(/<%= @d3 %>/, d3)
+                                  .gsub(/<%= @title %>/, title + ' Model Visualization')
                                   .gsub(/<%= @sidebar %>/, create_sidebar)
 
         # Write and open file
