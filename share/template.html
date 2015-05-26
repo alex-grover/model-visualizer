@@ -3,8 +3,10 @@
     <head>
         <title>Rails Model Visualizer</title>
         <meta charset="utf-8">
-        <link rel="stylesheet" type="text/css" href="<%= @css %>"/>
-        <script src="<%= @d3 %>" charset="utf-8"></script>
+        <!--<link rel="stylesheet" type="text/css" href="<%= @css %>"/>
+        <script src="<%= @d3 %>" charset="utf-8"></script>-->
+        <link rel="stylesheet" type="text/css" href="../model-visualizer/share/main.css"/>
+        <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
         <link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
     </head>
 
@@ -77,21 +79,46 @@
                               .linkDistance(200)
                               .start();
 
+                var node_drag = d3.behavior.drag()
+                  .on("dragstart", dragstart)
+                  .on("drag", dragmove)
+                  .on("dragend", dragend);
+
+                function dragstart(d, i) {
+                  force.stop() // stops auto positioning
+                }
+
+                function dragmove(d, i) {
+                  d.px += d3.event.dx;
+                  d.py += d3.event.dy;
+                  d.x += d3.event.dx;
+                  d.y += d3.event.dy;
+                }
+
+                function dragend(d, i) {
+                  d.fixed = true; // set node to fixed so  orce doesn't include in auto positioning
+                  force.resume();
+                }
+
+                function releasenode(d) {
+                  d.fixed = false;
+                }
+
                 var markerWidth = 8,
                     markerHeight = 8,
                     cRadius = 30, // play with the cRadius value
                     refX = cRadius + (markerWidth / 2),
                     refY = -Math.sqrt(cRadius / 3),
-                    maxNodeLabelSize = cRadius * 0.625,
-                    minNodeLabelSize = cRadius * 0.275,
+                    maxNodeLabelSize = cRadius * .7,
+                    minNodeLabelSize = cRadius * .5,
                     drSub = cRadius - refY;
 
                 // build the arrow.
                 svg.append("svg:defs")
                    .selectAll("marker")
-                   .data(["end"])      // Different link/path types can be defined here
+                   .data(["belongs_to", "has_and_belongs_to_many", "has_many", "has_one"])      // Different link/path types can be defined here
                    .enter().append("svg:marker")    // This section adds in the arrows
-                   .attr("id", String)
+                   .attr("id", function(d) {return d; })
                    .attr("viewBox", "0 -5 10 10")
                    .attr("refX", refX)
                    .attr("refY", refY)
@@ -105,24 +132,33 @@
                 var path = svg.append("svg:g").selectAll("path")
                               .data(force.links())
                               .enter().append("svg:path")
-                              .attr("class", "link")
-                              .attr("marker-end", "url(#end)")
-                              .style("stroke", function(d) {
-                                  switch(d.type) {
-                                      case "has_many":
-                                          return "#000000";
-                                      case "has_and_belongs_to_many":
-                                          return "#ff0000";
-                                      case "belongs_to":
-                                          return "#00ff00";
-                                      case "has_one":
-                                          return "#0000ff";
-                                      default:
-                                          return "#999999";
-                                  }
-                              });
+                              .attr("class", function(d) {return "link " + d.type; })
+                              .attr("marker-end", function(d) { return "url(#" + d.type + ")"; });
 
-                // Create the node groups under svg
+                var node = svg.append("g").selectAll(".node")
+                  .data(nodes)
+                  .enter().append("circle")
+                    .attr("class", "node")
+                    .attr("r", cRadius)
+                    .on("mouseover", mouseover)
+                    .on("mouseout", mouseout)
+                    .on('click', releasenode)
+                    .call(node_drag)
+
+                var text = svg.append("g").selectAll("text")
+                  .data(force.nodes())
+                  .enter().append("text")
+                    .text(function(d) {return d.name;})
+                    .attr("text-anchor", "middle")
+                    .attr("class", "node-label")
+                    //.style("font-size", "1px")
+                    .each(getSize)
+                    .style("font-size", function(d)
+                      {console.log(d.scale); return d.scale + "px";})
+                    //.attr("dy", function(d)
+                      //{return (d.scale / 5) + "px";});
+
+                /*// Create the node groups under svg
                 var gnodes = svg.selectAll('g.gnode')
                                 .data(nodes)
                                 .enter()
@@ -145,7 +181,7 @@
                                    .style("font-size", "1px")
                                    .each(getSize)
                                    .style("font-size", function(d) { return d.scale + "px"; })
-                                   .attr("dy", function(d) { return (d.scale / 5) + "px"; });
+                                   .attr("dy", function(d) { return (d.scale / 5) + "px"; });*/
 
                 // Show model attributes on hover
                 node.append("title").text(function(d) {
@@ -195,8 +231,11 @@
                       margin = 3.0,
                       cbbox = this.parentNode.getBBox(),
                       scale = Math.min(cbbox.width/bbox.width, cbbox.height/bbox.height);
-                  scale = Math.min(scale, maxNodeLabelSize)
-                  scale = Math.max(scale, minNodeLabelSize)
+                  //console.log(bbox, cbbox, scale);
+                  scale = Math.min(scale, maxNodeLabelSize);
+                  //console.log(scale);
+                  scale = Math.max(scale, minNodeLabelSize);
+                  //console.log(scale);
                   d.scale = (scale - margin);
                 }
 
@@ -247,12 +286,54 @@
                     //     .attr("y2", function(d) { return d.target.y; });
 
                     // Translate the groups
-                    gnodes.attr("transform", function(d) {
+                    node.attr("transform", transform);
+                    text.attr("transform", transform);
+                    /*node.attr("transform", function(d) {
                         return 'translate(' + [d.x, d.y] + ')';
                     });
+                    d3.selectAll("text").attr("x", function (d) {
+                      return d.x;
+                    })
+                      .attr("y", function (d) {
+                      return d.y;
+                    });*/
+                    node.each(collide(0.5));
                     // node.attr("cx", function(d) { return d.x; })
                     //     .attr("cy", function(d) { return d.y; });
                 });
+
+                function transform(d) {
+                  return "translate(" + d.x + "," + d.y + ")";
+                }
+
+                //Code for collision avoidance
+                var padding = 1, // separation between circles
+                    radius=cRadius;
+                function collide(alpha) {
+                  var quadtree = d3.geom.quadtree(nodes);
+                  return function(d) {
+                    var rb = 2*radius + padding,
+                        nx1 = d.x - rb,
+                        nx2 = d.x + rb,
+                        ny1 = d.y - rb,
+                        ny2 = d.y + rb;
+                    quadtree.visit(function(quad, x1, y1, x2, y2) {
+                      if (quad.point && (quad.point !== d)) {
+                        var x = d.x - quad.point.x,
+                            y = d.y - quad.point.y,
+                            l = Math.sqrt(x * x + y * y);
+                          if (l < rb) {
+                          l = (l - rb) / l * alpha;
+                          d.x -= x *= l;
+                          d.y -= y *= l;
+                          quad.point.x += x;
+                          quad.point.y += y;
+                         }
+                      }
+                      return x1 > nx2 || x2 < nx1 || y1 > ny2 || y2 < ny1;
+                    });
+                  };
+                }
 
                 // Search functionality for sidebar
                 var searchdiv = document.getElementsByClassName('sidebar')[0].firstChild;
@@ -274,13 +355,13 @@
                 // Highlight node on click. Must be global.
                 window.highlightNode = function(name) {
                     // Dim all links and all nodes but the one with the given name
-                    svg.selectAll(".gnode").filter(function (d, i) {
+                    svg.selectAll(".node").filter(function (d, i) {
                         return d.name != name;
                     }).style("opacity", "0.1");
                     svg.selectAll(".link").style("opacity", "0.1");
 
                     // TODO: display tooltip and keep everything else dimmed to undim later
-                    d3.selectAll(".gnode, .link").transition()
+                    d3.selectAll(".node, .link").transition()
                                                  .duration(1500)
                                                  .style("opacity", "1");
                 }
