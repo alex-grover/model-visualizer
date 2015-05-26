@@ -9,7 +9,7 @@ class Visualizer
         @models = models
     end
 
-    def create_visualization
+    def create_visualization(title)
         # Get file from gem directory
         g = Gem::Specification.find_by_name 'model-visualizer'
         template = File.join(g.full_gem_path, 'share/template.html')
@@ -21,6 +21,7 @@ class Visualizer
         output = template_contents.gsub(/<%= @models %>/, JSON.generate(@models))
                                   .gsub(/<%= @css %>/, css)
                                   .gsub(/<%= @d3 %>/, d3)
+                                  .gsub(/<%= @title %>/, title + ' Model Visualization')
                                   .gsub(/<%= @sidebar %>/, create_sidebar)
 
         # Write and open file
@@ -30,7 +31,7 @@ class Visualizer
 
     def create_sidebar
         str = '<div class="sidebar">'
-        str += '<div class="search"><input type="search" results=5 size="large" placeholder="Search"></div>' # input type="search" does not let you resize in webkit
+        str += '<div class="search"><input type="search" class="searchbox" results=5 size="large" placeholder="Search"></div>' # input type="search" does not let you resize in webkit
         @models.sort.each do |name, model|
             str += '<div class="model" onclick="highlightNode(this.innerHTML)">' + name + '</div>'
         end

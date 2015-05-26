@@ -14,6 +14,6 @@ class ModelVisualizer
         root = if ARGV.length == 1 then ARGV[0] else '.' end
 
         models = Parser.parse root
-        Visualizer.new(models).create_visualization
+        Visualizer.new(models).create_visualization(File.basename root)
     end
 end
