@@ -14,6 +14,7 @@ Gem::Specification.new do |s|
                    "lib/model-visualizer/model-parser.rb",
                    "lib/model-visualizer/schema-parser.rb",
                    "share/template.html",
+                   "share/main.css",
                    "share/d3.min.js"]
   s.homepage    = 'http://rubygems.org/gems/model-visualizer'
   s.license     = 'ISC'
