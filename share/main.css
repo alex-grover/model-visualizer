@@ -82,10 +82,6 @@ body {
   stroke-opacity: 0.8;
 }
 
-#has_one {
-  fill: #00f;
-}
-
 .d3-tip {
   line-height: 1;
   font-weight: bold;
