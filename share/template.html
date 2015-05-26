@@ -26,20 +26,6 @@
                 var links = [];
                 var node;
 
-                var markerWidth = 8,
-                    markerHeight = 8,
-                    cRadius = 30, // play with the cRadius value
-                    refX = cRadius + (markerWidth / 2),
-                    refY = -Math.sqrt(cRadius / 3),
-                    maxNodeLabelSize = cRadius * 0.625,
-                    minNodeLabelSize = cRadius * 0.275,
-                    drSub = cRadius - refY;
-
-                var legendRectSize = 18;
-                var legendSpacing = 4;
-
-                var color = d3.scale.category20b();
-
                 // Create node array and number each one
                 var i = 0;
                 for (var name in data) {
@@ -74,7 +60,6 @@
                     }
                 }
 
-
                 var container = document.getElementsByClassName("inner-container")[0];
                 var width = container.clientWidth,
                     height = container.clientHeight;
@@ -85,77 +70,82 @@
                             .attr("height", height);
 
                 var force = d3.layout.force()
-                  .size([width, height])
-                  .nodes(d3.values(nodes))
-                  .links(links)
-                  //.gravity(0.1)
-                  .charge(-1000)
-                  .linkDistance(200)
-                  //.linkStrength(0.9)
-                  .start();
+                              .size([width, height])
+                              .nodes(d3.values(nodes))
+                              .links(links)
+                              .charge(-1000)
+                              .linkDistance(200)
+                              .start();
 
-
+                var markerWidth = 8,
+                    markerHeight = 8,
+                    cRadius = 30, // play with the cRadius value
+                    refX = cRadius + (markerWidth / 2),
+                    refY = -Math.sqrt(cRadius / 3),
+                    maxNodeLabelSize = cRadius * 0.625,
+                    minNodeLabelSize = cRadius * 0.275,
+                    drSub = cRadius - refY;
 
                 // build the arrow.
-                svg.append("svg:defs").selectAll("marker")
-                    .data(["end"])      // Different link/path types can be defined here
-                  .enter().append("svg:marker")    // This section adds in the arrows
-                    .attr("id", String)
-                    .attr("viewBox", "0 -5 10 10")
-                    .attr("refX", refX)
-                    .attr("refY", refY)
-                    .attr("markerWidth", markerWidth)
-                    .attr("markerHeight", markerHeight)
-                    .attr("orient", "auto")
-                  .append("svg:path")
-                    .attr("d", "M0,-5L10,0L0,5");
+                svg.append("svg:defs")
+                   .selectAll("marker")
+                   .data(["end"])      // Different link/path types can be defined here
+                   .enter().append("svg:marker")    // This section adds in the arrows
+                   .attr("id", String)
+                   .attr("viewBox", "0 -5 10 10")
+                   .attr("refX", refX)
+                   .attr("refY", refY)
+                   .attr("markerWidth", markerWidth)
+                   .attr("markerHeight", markerHeight)
+                   .attr("orient", "auto")
+                   .append("svg:path")
+                   .attr("d", "M0,-5L10,0L0,5");
 
                 // add the links and the arrows
                 var path = svg.append("svg:g").selectAll("path")
-                    .data(force.links())
-                  .enter().append("svg:path")
-                //    .attr("class", function(d) { return "link " + d.type; })
-                    .attr("class", "link")
-                    .style("stroke", function(d) {
-                      switch(d.type) {
-                          case "belongs_to":
-                              return "#000";
-                          case "has_and_belongs_to_many":
-                              return "#f00";
-                          case "has_many":
-                              return "#0f0";
-                          case "has_one":
-                              return "#00f";
-                          default:
-                              return "#999";
-                      }
-                    })
-                    .style("stroke-width", function(d) { return Math.sqrt(d.value); })
-                    .attr("marker-end", "url(#end)");
+                              .data(force.links())
+                              .enter().append("svg:path")
+                              .attr("class", "link")
+                              .attr("marker-end", "url(#end)")
+                              .style("stroke", function(d) {
+                                  switch(d.type) {
+                                      case "has_many":
+                                          return "#000000";
+                                      case "has_and_belongs_to_many":
+                                          return "#ff0000";
+                                      case "belongs_to":
+                                          return "#00ff00";
+                                      case "has_one":
+                                          return "#0000ff";
+                                      default:
+                                          return "#999999";
+                                  }
+                              });
 
                 // Create the node groups under svg
                 var gnodes = svg.selectAll('g.gnode')
-                  .data(nodes)
-                  .enter()
-                  .append('g')
-                  .on("mouseover", mouseover)
-                  .on("mouseout", mouseout)
-                  .classed('gnode', true);
+                                .data(nodes)
+                                .enter()
+                                .append('g')
+                                .on("mouseover", mouseover)
+                                .on("mouseout", mouseout)
+                                .classed('gnode', true);
 
                 // Add circle to each group
                 node = gnodes.append("circle")
-                  .attr("class", "node")
-                  .attr("r", cRadius)
-                  .call(force.drag);
+                             .attr("class", "node")
+                             .attr("r", cRadius)
+                             .call(force.drag);
 
                 // Append labels to each group
                 var labels = gnodes.append("text")
-                  .text(function(d) { return d.name; })
-                  .attr("text-anchor", "middle")
-                  .style("font-size", "1px")
-                  .each(getSize)
-                  .style("font-size", function(d) { return d.scale + "px"; })
-                  .attr("dy", function(d) { return (d.scale / 5) + "px"; });
+                                   .text(function(d) { return d.name; })
+                                   .attr("text-anchor", "middle")
+                                   .attr("class", "node-label")
+                                   .style("font-size", "1px")
+                                   .each(getSize)
+                                   .style("font-size", function(d) { return d.scale + "px"; })
+                                   .attr("dy", function(d) { return (d.scale / 5) + "px"; });
 
                 // Show model attributes on hover
                 node.append("title").text(function(d) {
@@ -169,6 +159,11 @@
 
                     return description;
                 });
+
+                // var legendRectSize = 18;
+                // var legendSpacing = 4;
+
+                // var color = d3.scale.category20b();
 
                 // var legend = svg.selectAll('.legend')
                 //   .data(force.links().domain())
@@ -286,7 +281,7 @@
 
                     // TODO: display tooltip and keep everything else dimmed to undim later
                     d3.selectAll(".gnode, .link").transition()
-                                                 .duration(5000)
+                                                 .duration(1500)
                                                  .style("opacity", "1");
                 }
             })();

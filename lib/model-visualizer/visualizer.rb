@@ -31,7 +31,7 @@ class Visualizer
 
     def create_sidebar
         str = '<div class="sidebar">'
-        str += '<div class="search"><input type="search" results=5 size="large" placeholder="Search"></div>' # input type="search" does not let you resize in webkit
+        str += '<div class="search"><input type="search" class="searchbox" results=5 size="large" placeholder="Search"></div>' # input type="search" does not let you resize in webkit
         @models.sort.each do |name, model|
             str += '<div class="model" onclick="highlightNode(this.innerHTML)">' + name + '</div>'
         end
