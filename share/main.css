@@ -80,4 +80,37 @@ body {
   fill: none;
   stroke-width: 1.5px;
   stroke-opacity: 0.8;
+  stroke: #999;
+}
+
+.link.belongs_to {
+  stroke: #000;
+}
+
+#belongs_to {
+  fill: #000;
+}
+
+.link.has_and_belongs_to_many {
+  stroke: #f00;
+}
+
+#has_and_belongs_to_many {
+  fill: #f00;
+}
+
+.link.has_many {
+  stroke: #0f0;
+}
+
+#has_many {
+  fill: #0f0;
+}
+
+.link.has_one {
+  stroke: #00f;
+}
+
+#has_one {
+  fill: #00f;
 }
