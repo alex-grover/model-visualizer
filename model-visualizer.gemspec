@@ -16,7 +16,8 @@ Gem::Specification.new do |s|
                    "share/template.html",
                    "share/main.css",
                    "share/background.png",
-                   "share/d3.min.js"]
+                   "share/d3.min.js",
+                   "share/index.js"]
   s.homepage    = 'http://rubygems.org/gems/model-visualizer'
   s.license     = 'ISC'
   s.add_runtime_dependency 'activesupport'

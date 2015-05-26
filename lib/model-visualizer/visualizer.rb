@@ -15,6 +15,7 @@ class Visualizer
         template = File.join(g.full_gem_path, 'share/template.html')
         css = File.join(g.full_gem_path, 'share/main.css')
         d3 = File.join(g.full_gem_path, 'share/d3.min.js')
+        tooltip = File.join(g.full_gem_path, 'share/index.js')
 
         # Insert data into file
         template_contents = File.read template
@@ -23,6 +24,7 @@ class Visualizer
                                   .gsub(/<%= @d3 %>/, d3)
                                   .gsub(/<%= @title %>/, title + ' Model Visualization')
                                   .gsub(/<%= @sidebar %>/, create_sidebar)
+                                  .gsub(/<%= @tooltip %>/, tooltip)
 
         # Write and open file
         File.open(FILE_PATH, 'w') {|file| file.puts output}
