@@ -15,7 +15,7 @@ class Visualizer
         template = File.join(g.full_gem_path, 'share/template.html')
         css = File.join(g.full_gem_path, 'share/main.css')
         d3 = File.join(g.full_gem_path, 'share/d3.min.js')
-        tooltip = File.join(g.full_gem_path, 'share/index.js')
+        tooltip = File.join(g.full_gem_path, 'share/d3.tip.js')
 
         # Insert data into file
         template_contents = File.read template
