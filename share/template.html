@@ -5,6 +5,7 @@
         <meta charset="utf-8">
         <link rel="stylesheet" type="text/css" href="<%= @css %>"/>
         <script src="<%= @d3 %>" charset="utf-8"></script>
+        <script src="<%= @tooltip %>"></script>
         <link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
     </head>
 
@@ -25,6 +26,7 @@
                 var nodes = [];
                 var links = [];
                 var node;
+                var nodeSelected = null;
 
                 // Create node array and number each one
                 var i = 0;
@@ -129,6 +131,7 @@
                                 .append('g')
                                 .on("mouseover", mouseover)
                                 .on("mouseout", mouseout)
+                                .on("click", click)
                                 .classed('gnode', true);
 
                 // Add circle to each group
@@ -147,18 +150,22 @@
                                    .style("font-size", function(d) { return d.scale + "px"; })
                                    .attr("dy", function(d) { return (d.scale / 5) + "px"; });
 
-                // Show model attributes on hover
-                node.append("title").text(function(d) {
-                    var description = d.name + '\r\n';
-
+                // initializes the tooltip for node mouseover
+                var tip = d3.tip()
+                  .attr('class', 'd3-tip')
+                  .offset([-10, 0])
+                  .html(function(d) {
+                    var description = d.name + '<br>';
                     for (var attr in d.schema_info) {
-                        if (d.schema_info[attr].length > 0) {
-                            description += '\r\n' + attr + ": " + d.schema_info[attr].join(', ');
-                        }
+                      if (d.schema_info[attr].length > 0) {
+                        description += '<br>' + attr + ": " + d.schema_info[attr].join(', ');
+                      }
                     }
-
                     return description;
-                });
+                  })
+
+                // svg calls tip for tooltip functionality
+                svg.call(tip);
 
                 // var legendRectSize = 18;
                 // var legendSpacing = 4;
@@ -201,31 +208,105 @@
                 }
 
                 function mouseover() {
-                  d3.select(this).select("circle").transition()
-                      .duration(500)
-                      .attr("r", function(d){
-                        return cRadius * 1.1;
-                      })
-                      .style("fill", function(d) {
-                         return "#90EE90";
-                      })
-                  d3.select(this).select('text').transition()
-                      .duration(500)
-                      .style("font-size", function(d) { return d.scale * 1.1; });
+                  if (nodeSelected === null) {
+                    d3.select(this).select("circle").transition()
+                        .duration(500)
+                        .attr("r", function(d){
+                          return cRadius * 1.1;
+                        })
+                        .style("fill", function(d) {
+                           return "#90EE90";
+                        });
+                    d3.select(this).select('text').transition()
+                        .duration(500)
+                        .style("font-size", function(d) { return d.scale * 1.1; });
+                    // A little hackish, but couldn't figure out how to use mouseover with anonymous function inside
+                    tip.show(d3.select(this)[0][0].__data__);
+                  }
                 }
 
                 function mouseout() {
-                  d3.select(this).select('text').transition()
-                      .duration(500)
-                      .style("font-size", function(d) { return d.scale; })
-                  d3.select(this).select("circle").transition()
-                      .duration(500)
-                      .attr("r", function(d){
-                        return cRadius;
-                      })
-                      .style("fill", function(d) {
-                         return "#6495ED";
-                      });
+                  if (nodeSelected === null) {
+                    d3.select(this).select('text').transition()
+                        .duration(500)
+                        .style("font-size", function(d) { return d.scale; });
+                    d3.select(this).select("circle").transition()
+                        .duration(500)
+                        .attr("r", function(d){
+                          return cRadius;
+                        })
+                        .style("fill", function(d) {
+                           return "#6495ED";
+                        });
+                    // same comment as mouseover ^^^
+                    tip.hide(d3.select(this)[0][0].__data__);
+                  }
+                }
+
+                function click() {
+                  // if we are clicking a node and there is no node currently selected
+                  if (nodeSelected === null) {
+                    nodeSelected = d3.select(this);
+                    nodeSelected.select("circle").transition()
+                        .duration(500)
+                        .attr("r", function(d){
+                          return cRadius * 1.1;
+                        })
+                        .style("fill", function(d) {
+                           return "#90EE90";
+                        });
+                    nodeSelected.select('text').transition()
+                        .duration(500)
+                        .style("font-size", function(d) { return d.scale * 1.1; });
+                    tip.show(nodeSelected[0][0].__data__);
+                  }
+                  // if we are clicking a node that is currently selected
+                  else if(nodeSelected[0][0].__data__.index === d3.select(this)[0][0].__data__.index) {
+                    nodeSelected.select('text').transition()
+                        .duration(500)
+                        .style("font-size", function(d) { return d.scale; });
+                    nodeSelected.select("circle").transition()
+                        .duration(500)
+                        .attr("r", function(d){
+                          return cRadius;
+                        })
+                        .style("fill", function(d) {
+                           return "#6495ED";
+                        });
+                    tip.hide(nodeSelected[0][0].__data__);
+
+                    nodeSelected = null;
+                  }
+                  // if we are clicking a node that is not already selected
+                  else {
+                    nodeSelected.select('text').transition()
+                        .duration(500)
+                        .style("font-size", function(d) { return d.scale; });
+                    nodeSelected.select("circle").transition()
+                        .duration(500)
+                        .attr("r", function(d){
+                          return cRadius;
+                        })
+                        .style("fill", function(d) {
+                           return "#6495ED";
+                        });
+                    tip.hide(nodeSelected[0][0].__data__);
+
+                    nodeSelected = d3.select(this);
+
+                    nodeSelected.select("circle").transition()
+                        .duration(500)
+                        .attr("r", function(d){
+                          return cRadius * 1.1;
+                        })
+                        .style("fill", function(d) {
+                           return "#90EE90";
+                        });
+                    nodeSelected.select('text').transition()
+                        .duration(500)
+                        .style("font-size", function(d) { return d.scale * 1.1; });
+                    tip.show(d3.select(this)[0][0].__data__);
+                  }
                 }
 
                 force.on("tick", function() {
