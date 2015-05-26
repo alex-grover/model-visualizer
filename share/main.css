@@ -11,6 +11,10 @@ body {
   top: 0;
 }
 
+text {
+  pointer-events: none;
+}
+
 .sidebar {
   position: fixed;
   left: 0;
@@ -81,3 +85,45 @@ body {
   stroke-width: 1.5px;
   stroke-opacity: 0.8;
 }
+
+.legend-outer {
+  width: 236px;
+  padding: 10px;
+  height: 110px;
+  border: 2px solid #9E9DA6;
+  position: fixed;
+  right: 44px;
+  bottom: 44px;
+}
+
+.legend-outer legend {
+  font-size: large;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.ho_line {
+  color: #0000ff;
+} 
+
+.hm_line{
+  color: #000000;
+}
+
+.bt_line {
+  color: #00ff00;
+}
+
+.habtm_line {
+  color: #ff0000;
+}
+.association_name {
+  margin-left: 10px;
+}
+
+.legend-has_one, .legend-has_many, .legend-belongs_to, .legend-has_and_belongs_to_many {
+  display: flex;
+  cursor: pointer;
+}
+
+
