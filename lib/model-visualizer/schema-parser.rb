@@ -13,7 +13,8 @@ class SchemaParser
     def parse(root)
         file = File.join(root, SCHEMA_FILE)
         unless File.file? file
-            abort 'db/schema.rb does not exist! Run from or pass the root directory of your Rails project.'
+            puts 'db/schema.rb does not exist! If this is surprising, run the command again from the Rails project directory.'
+            return
         end
 
         curr_model = nil

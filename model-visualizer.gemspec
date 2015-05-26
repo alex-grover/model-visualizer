@@ -16,6 +16,7 @@ Gem::Specification.new do |s|
                    "share/template.html",
                    "share/main.css",
                    "share/background.png",
+                   "share/OpenSans-Regular.ttf",
                    "share/d3.min.js"]
   s.homepage    = 'http://rubygems.org/gems/model-visualizer'
   s.license     = 'ISC'
