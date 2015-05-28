@@ -95,6 +95,7 @@ body {
   position: fixed;
   right: 44px;
   bottom: 44px;
+  background-color: white;
 }
 
 .legend-outer legend {
@@ -105,7 +106,7 @@ body {
 
 .ho_line {
   color: #0000ff;
-} 
+}
 
 .hm_line{
   color: #000000;
@@ -118,11 +119,13 @@ body {
 .habtm_line {
   color: #ff0000;
 }
+
 .association_name {
   margin-left: 10px;
 }
 
 .legend-has_one, .legend-has_many, .legend-belongs_to, .legend-has_and_belongs_to_many {
+  display: -webkit-flex;
   display: flex;
   cursor: pointer;
 }
