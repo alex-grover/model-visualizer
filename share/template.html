@@ -351,11 +351,11 @@
                     var gnodes = svg.selectAll(".gnode");
 
                     gnodes.filter(function (d, i) {
-                        return d.name != name;
+                        return d.name !== name;
                     }).style("opacity", "0.1");
 
                     gnodes.filter(function (d, i) {
-                        return d.name == name;
+                        return d.name === name;
                     }).style("opacity", "1.0");
 
                     svg.selectAll(".link").style("opacity", "0.1");
@@ -367,24 +367,27 @@
                     }, 1500);
                 }
 
+                var linkHighlightTimeout;
                 window.highlightAssociation = function(association) {
-                  //dim all OTHER types of associations
-                  svg.selectAll(".link").filter(function (d, i) {
-                    return d.type != association;
-                  }).style("opacity", "0.1");
+                    if (linkHighlightTimeout !== null) {
+                        clearTimeout(linkHighlightTimeout);
+                    }
 
-                  // svg.selectAll(".link").filter(function (d, i) {
-                  //   return d.type = association;
-                  // }).style("stroke-width", "3.5px");
+                    var links = svg.selectAll(".link");
 
-                  d3.selectAll(".gnode, .link").transition()
-                   .duration(4500)
-                   .style("opacity", "1");
+                    // dim all OTHER types of associations
+                    links.filter(function (d, i) {
+                        return d.type !== association;
+                    }).style("opacity", "0.1");
 
-                  // d3.selectAll(".link").transition()
-                  //   .duration(1500)
-                  //   .style("stroke-width", "1.5px");
+                    links.filter(function (d, i) {
+                        return d.type === association;
+                    }).style("opacity", "1.0");
 
+                    linkHighlightTimeout = setTimeout(function() {
+                        d3.selectAll(".link")
+                          .style("opacity", "1");
+                    }, 1500);
                 }
 
             })();
