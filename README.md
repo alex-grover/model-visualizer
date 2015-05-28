@@ -8,7 +8,7 @@ Install from source:
 $ git clone https://github.com/ajgrover/model-visualizer.git
 $ cd model-visualizer
 $ gem build model-visualizer.gemspec
-$ [sudo] gem install model-visualizer-*.gem
+$ [sudo] gem install model-visualizer-1.0.0.gem
 ```
 
 Install via RubyGems:
