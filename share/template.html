@@ -176,7 +176,7 @@
                     var description = d.name + '<br>';
                     for (var attr in d.schema_info) {
                       if (d.schema_info[attr].length > 0) {
-                        description += '<br>' + attr + ": " + d.schema_info[attr].join(', ');
+                        description += '<br>' + attr.replace("_", " ").toUpperCase() + ": " + d.schema_info[attr].join(', ');
                       }
                     }
                     return description;
