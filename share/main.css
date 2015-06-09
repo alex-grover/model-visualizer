@@ -85,6 +85,43 @@ body {
   fill: none;
   stroke-width: 1.5px;
   stroke-opacity: 0.8;
+  stroke: #999999;
+}
+
+.belongs_to {
+  stroke: #CC0000;
+  color: #CC0000;
+}
+
+#belongs_to {
+  fill: #CC0000;
+}
+
+.has_and_belongs_to_many {
+  stroke: #CCCC00;
+  color: #CCCC00;
+}
+
+#has_and_belongs_to_many {
+  fill: #CCCC00;
+}
+
+.has_many {
+  stroke: #0000CC;
+  color: #0000CC;
+}
+
+#has_many {
+  fill: #0000CC;
+}
+
+.has_one {
+  stroke: #00CC00;
+  color: #00CC00;
+}
+
+#has_one {
+  fill: #00CC00;
 }
 
 .legend-outer {
@@ -102,22 +139,6 @@ body {
   font-size: large;
   margin-left: auto;
   margin-right: auto;
-}
-
-.ho_line {
-  color: #0000ff;
-}
-
-.hm_line{
-  color: #000000;
-}
-
-.bt_line {
-  color: #00ff00;
-}
-
-.habtm_line {
-  color: #ff0000;
 }
 
 .association_name {
