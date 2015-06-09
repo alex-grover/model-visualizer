@@ -168,6 +168,12 @@
                                    .style("font-size", function(d) { return d.scale + "px"; })
                                    .attr("dy", function(d) { return (d.scale / 5) + "px"; });
 
+                function capitalizeEachWord(str) {
+                  return str.replace(/\w\S*/g, function(txt) {
+                    return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+                  });
+                }
+
                 // initializes the tooltip for node mouseover
                 var tip = d3.tip()
                   .attr('class', 'd3-tip')
@@ -176,7 +182,7 @@
                     var description = d.name + '<br>';
                     for (var attr in d.schema_info) {
                       if (d.schema_info[attr].length > 0) {
-                        description += '<br>' + attr.replace("_", " ").toUpperCase() + ": " + d.schema_info[attr].join(', ');
+                        description += '<br>' + capitalizeEachWord(attr.replace("_", " ")) + ": " + d.schema_info[attr].join(', ');
                       }
                     }
                     return description;
